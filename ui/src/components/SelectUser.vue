@@ -2,25 +2,38 @@
   <div>
     <h1>Who are you?</h1>
     <ul>
-      <li><button>John</button></li>
-      <li><button>John2</button></li>
-      <li><button>John3</button></li>
-      <li><button>John4</button></li>
+      <li v-for="user in allUsers" :key="user.name"><button @click="$emit('user-selection', user.name)">{{ user.name }}</button></li>
     </ul>
-    <input name="name"> <button>Join Registry</button>
+    <form @submit="onCreateUser">
+      <input name="name" v-model="createdUser"> <button type="submit">Join Registry</button>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
 
-@Options({
+export default {
+  name: "SelectUser",
   props: {
-    msg: String
+    allUsers: Array
+  },
+  data() {
+    return {
+      createdUser: ''
+    }
+  },
+  methods: {
+    onCreateUser(e) {
+      e.preventDefault()
+
+      if (!this.createdUser) {
+        alert("Please enter a username")
+        return
+      }
+
+      this.$emit('user-creation', this.createdUser)
+    }
   }
-})
-export default class SelectUser extends Vue {
-  msg!: string
 }
 </script>
 
