@@ -31,6 +31,8 @@ export default {
         return
       }
 
+      //TODO prevent dup names
+
       this.$emit('user-creation', this.createdUser)
     }
   }

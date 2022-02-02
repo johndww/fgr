@@ -2,8 +2,10 @@
   <div v-show="currentUserName" style="text-align: right">
     {{ currentUserName }}
   </div>
-  <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserName" :allUsers="allUsers"/>
-  <GiftResults v-show="currentUserName" :currentUserName="currentUserName" :allUsers="allUsers"/>
+  <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserName"
+              :allUsers="allUsers"/>
+  <GiftResults v-show="currentUserName" :currentUserName="currentUserName" :allUsers="allUsers"
+               @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift" @release-gift="releaseGift"/>
 </template>
 
 <script lang="ts">
@@ -12,8 +14,7 @@ import GiftResults from "./components/GiftResults.vue";
 
 export default {
   name: 'App',
-  props: {
-  },
+  props: {},
   data() {
     return {
       currentUserName: "",
@@ -27,7 +28,25 @@ export default {
 
     createUser(userName: String) {
       this.currentUserName = userName
-      this.allUsers = [...this.allUsers, {name: userName}]
+      this.allUsers = [...this.allUsers, {name: userName, gifts: []}]
+    },
+    assignGift(details) {
+      const user = this.allUsers.find((user) => user.name === details.forUserName)
+      const gift = user.gifts.find((gift) => gift.id === details.giftId)
+      gift.assignedUserName = details.byUserName
+    },
+    addGift(giftName: String) {
+      const user = this.allUsers.find((user) => user.name === this.currentUserName)
+      user.gifts = [...user.gifts, {id: Math.floor(Math.random() * 1000), name: giftName}]
+    },
+    deleteGift(giftId) {
+      const user = this.allUsers.find((user) => user.name === this.currentUserName)
+      user.gifts = user.gifts.filter((gift) => gift.id !== giftId)
+    },
+    releaseGift(details) {
+      const user = this.allUsers.find((user) => user.name === details.forUserName)
+      const gift = user.gifts.find((gift) => gift.id === details.giftId)
+      gift.assignedUserName = ''
     }
   },
   components: {
@@ -40,12 +59,16 @@ export default {
         name: "John",
         gifts: [
           {
-            name: "Xbox"
+            id: 1,
+            name: "Xbox",
+            assignedUserName: "Haritha"
           },
           {
+            id: 2,
             name: "Ps6"
           },
           {
+            id: 3,
             name: "Gamecube"
           }
         ]
@@ -54,13 +77,17 @@ export default {
         name: "Haritha",
         gifts: [
           {
-            name: "hGift1"
+            id: 4,
+            name: "Shoes"
           },
           {
-            name: "hGift2"
+            id: 5,
+            name: "Ski goggles",
+            assignedUserName: "John"
           },
           {
-            name: "hGift3"
+            id: 6,
+            name: "Hat"
           }
         ]
       },
@@ -68,7 +95,8 @@ export default {
         name: "Sue",
         gifts: [
           {
-            name: "test"
+            id: 7,
+            name: "Skis"
           }
         ]
       },
@@ -76,10 +104,13 @@ export default {
         name: "Bruce",
         gifts: [
           {
+            id: 8,
             name: "wine"
           },
           {
-            name: "beer"
+            id: 9,
+            name: "beer",
+            assignedUserName: "Sue"
           },
         ]
       }
