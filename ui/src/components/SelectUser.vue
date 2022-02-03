@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1>Who are you?</h1>
+    <h1 class="text-center my-3 pb-3">Who are you?</h1>
+
     <ul>
       <li v-for="user in allUsers" :key="user.name"><button @click="$emit('user-selection', user.name)">{{ user.name }}</button></li>
     </ul>

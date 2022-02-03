@@ -1,11 +1,29 @@
 <template>
-  <div v-show="currentUserName" style="text-align: right">
-    {{ currentUserName }}
+
+  <div class="vh-100" style="background-color: #3da2c3;">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col col-lg-9 col-xl-7">
+          <div class="card rounded-3">
+            <div class="card-body p-4">
+
+              <div v-show="currentUserName" style="text-align: right">
+                {{ currentUserName }}
+              </div>
+              <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserName"
+                          :allUsers="allUsers"/>
+              <GiftResults v-show="currentUserName" :currentUserName="currentUserName" :allUsers="allUsers"
+                           @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift"
+                           @release-gift="releaseGift"/>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserName"
-              :allUsers="allUsers"/>
-  <GiftResults v-show="currentUserName" :currentUserName="currentUserName" :allUsers="allUsers"
-               @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift" @release-gift="releaseGift"/>
+
+
 </template>
 
 <script lang="ts">
@@ -126,6 +144,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

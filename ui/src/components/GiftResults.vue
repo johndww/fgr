@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Gifting Results</h1>
+    <h1 class="text-center my-3 pb-3">Gifting Results</h1>
     <div class="tabbable tabs-left">
       <ul class="nav nav-tabs">
         <li v-for="user in allUsers" :key="user.name">
