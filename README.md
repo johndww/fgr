@@ -19,24 +19,24 @@ basic gift registry
 
 login to be able to see claimed gifts & to claim gifts
 
-##Pages
+## Pages
 
-###Unauthenticated Home Page
+### Unauthenticated Home Page
 - [ ] Login/Create Account
 - [ ] website explanation
 
-###Authenticated Home Page
+### Authenticated Home Page
 - [ ] Show all events you are linked to
 - [ ] Create Event button
 - [ ] Logout
 
-###Create Event
+### Create Event
 - [ ] capture event name and description
 - [ ] add members
     - [ ] by email 
     - [ ] or by previous association
 
-###Show Event
+### Show Event
 - [ ] display all members & gifts
 - [ ] ability to claim and unclaim gifts
 - [ ] add/remove your gift requests
@@ -44,7 +44,7 @@ login to be able to see claimed gifts & to claim gifts
   - [ ] delete event (with confirmation)
   - [ ] update event details (& membership)
 
-##DB Schema
+## DB Schema
 
 * event 
     - id
