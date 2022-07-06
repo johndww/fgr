@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "typeRoots": [
+      "./extra-types",
+      "node_modules/@types"
+    ],
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",

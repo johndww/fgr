@@ -13,31 +13,33 @@
 
 <script lang="ts">
 
-export default {
+import { defineComponent } from "vue";
+
+export default defineComponent({
   name: "SelectUser",
   props: {
-    allUsers: Array
+    allUsers: []
   },
   data() {
     return {
-      createdUser: ''
+      createdUserName: ''
     }
   },
   methods: {
-    onCreateUser(e) {
+    onCreateUser(e: any) {
       e.preventDefault()
 
-      if (!this.createdUser) {
+      if (!this.createdUserName) {
         alert("Please enter a username")
         return
       }
 
       //TODO prevent dup names
 
-      this.$emit('user-creation', this.createdUser)
+      this.$emit('user-creation', this.createdUserName)
     }
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

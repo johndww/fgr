@@ -29,42 +29,83 @@
 <script lang="ts">
 import SelectUser from './components/SelectUser.vue';
 import GiftResults from "./components/GiftResults.vue";
+import { defineComponent } from "vue";
 
-export default {
+declare interface User {
+  name: string,
+  gifts: Gift[]
+}
+
+declare interface Gift {
+  id: string
+  name: string
+  assignedUserName?: string
+}
+
+export default defineComponent({
   name: 'App',
   props: {},
   data() {
     return {
       currentUserName: "",
-      allUsers: []
+      allUsers: [] as User[],
     }
   },
   methods: {
-    userSelection(userName: String) {
+    userSelection(userName: string) {
       this.currentUserName = userName
     },
 
-    createUser(userName: String) {
+    createUser(userName: string) {
       this.currentUserName = userName
       this.allUsers = [...this.allUsers, {name: userName, gifts: []}]
     },
-    assignGift(details) {
-      const user = this.allUsers.find((user) => user.name === details.forUserName)
-      const gift = user.gifts.find((gift) => gift.id === details.giftId)
+    assignGift(details: { forUserName: string; giftId: string; byUserName: string; }) {
+      const user = this.allUsers.find((user) => user.name === details.forUserName) || null
+      if (user == null) {
+        console.log("unable to assign gift. cannot find user: " + details.forUserName)
+        return
+      }
+
+      const gift = user.gifts.find((gift: { id: string; }) => gift.id === details.giftId) || null
+      if (gift == null) {
+        console.log("unable to assign gift. cannot find gift: " + details.giftId)
+        return
+      }
       gift.assignedUserName = details.byUserName
     },
-    addGift(giftName: String) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserName)
-      user.gifts = [...user.gifts, {id: Math.floor(Math.random() * 1000), name: giftName}]
+    addGift(giftName: string) {
+      const user = this.allUsers.find((user) => user.name === this.currentUserName) || null
+      if (user == null) {
+        console.log("unable to add gift. cannot find user: " + this.currentUserName)
+        return
+      }
+
+      user.gifts = [...user.gifts, {id: Math.floor(Math.random() * 1000).toString(), name: giftName, assignedUserName: ""}]
     },
-    deleteGift(giftId) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserName)
+    deleteGift(giftId: string) {
+      const user = this.allUsers.find((user) => user.name === this.currentUserName) || null
+      if (user == null) {
+        console.log("unable to delete gift. cannot find user: " + this.currentUserName)
+        return
+      }
+
       user.gifts = user.gifts.filter((gift) => gift.id !== giftId)
     },
-    releaseGift(details) {
-      const user = this.allUsers.find((user) => user.name === details.forUserName)
-      const gift = user.gifts.find((gift) => gift.id === details.giftId)
-      gift.assignedUserName = ''
+    releaseGift(details: { forUserName: string; giftId: string; }) {
+      const user = this.allUsers.find((user) => user.name === details.forUserName) || null
+      if (user == null) {
+        console.log("unable to release gift. cannot find user: " + details.forUserName)
+        return
+      }
+
+      const gift = user.gifts.find((gift) => gift.id === details.giftId) || null
+      if (gift == null) {
+        console.log("unable to release gift. cannot find gift: " + details.giftId)
+        return
+      }
+
+      gift.assignedUserName = undefined
     }
   },
   components: {
@@ -77,16 +118,16 @@ export default {
         name: "John",
         gifts: [
           {
-            id: 1,
+            id: "1",
             name: "Xbox",
             assignedUserName: "Haritha"
           },
           {
-            id: 2,
-            name: "Ps6"
+            id: "2",
+            name: "Ps6",
           },
           {
-            id: 3,
+            id: "3",
             name: "Gamecube"
           }
         ]
@@ -95,16 +136,16 @@ export default {
         name: "Haritha",
         gifts: [
           {
-            id: 4,
+            id: "4",
             name: "Shoes"
           },
           {
-            id: 5,
+            id: "5",
             name: "Ski goggles",
             assignedUserName: "John"
           },
           {
-            id: 6,
+            id: "6",
             name: "Hat"
           }
         ]
@@ -113,7 +154,7 @@ export default {
         name: "Sue",
         gifts: [
           {
-            id: 7,
+            id: "7",
             name: "Skis"
           }
         ]
@@ -122,11 +163,11 @@ export default {
         name: "Bruce",
         gifts: [
           {
-            id: 8,
+            id: "8",
             name: "wine"
           },
           {
-            id: 9,
+            id: "9",
             name: "beer",
             assignedUserName: "Sue"
           },
@@ -134,7 +175,7 @@ export default {
       }
     ]
   }
-}
+})
 </script>
 
 <style>
@@ -144,5 +185,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  margin-top: 60px;
 }
 </style>

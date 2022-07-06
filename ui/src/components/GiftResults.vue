@@ -11,28 +11,36 @@
         </li>
       </ul>
     </div>
+
     <template v-if="this.viewResultsUser && this.currentUserName !== this.viewResultsUserName">
       <div class="tab-content">
-        <ul class="list-group">
-          <li class="list-group-item list-group-item-light" v-for="gift in unassignedGifts" :key="gift.name">
-            {{ gift.name }}
-            <button
-                @click="$emit('assign-gift', {giftId: gift.id, forUserName: this.viewResultsUserName, byUserName: this.currentUserName})"
-                class="btn btn-primary">
-              Claim Gift
-            </button>
-          </li>
-
-          <li class="list-group-item list-group-item-dark" v-for="gift in assignedGifts" :key="gift.name">
-            {{ gift.name }}
-            <template v-if="gift.assignedUserName === this.currentUserName">
-              <button class="btn btn-warning"
-                      @click="$emit('release-gift', {giftId: gift.id, forUserName: this.viewResultsUserName})">
-                Release Gift
+        <table class="table mb-4">
+          <tbody>
+          <tr v-for="gift in unassignedGifts" :key="gift.name">
+            <td>{{ gift.name }}</td>
+            <td>
+              <button
+                  @click="$emit('assign-gift', {giftId: gift.id, forUserName: this.viewResultsUserName, byUserName: this.currentUserName})"
+                  class="btn btn-primary">
+                Claim Gift
               </button>
+            </td>
+          </tr>
+
+          <tr v-for="gift in assignedGifts" :key="gift.name">
+            <td>{{ gift.name }}</td>
+            <template v-if="gift.assignedUserName === this.currentUserName">
+              <td>
+                <button class="btn btn-warning"
+                        @click="$emit('release-gift', {giftId: gift.id, forUserName: this.viewResultsUserName})">
+                  Release Gift
+                </button>
+              </td>
             </template>
-          </li>
-        </ul>
+          </tr>
+          </tbody>
+        </table>
+
       </div>
     </template>
 
@@ -47,13 +55,17 @@
 <script lang="ts">
 
 import SelfGiftResults from "./SelfGiftResults.vue";
+import User from "./App.vue";
+import Gift from "./App.vue";
+import {defineComponent, PropType} from "vue";
 
-export default {
+
+export default defineComponent({
   name: "GiftResults",
   components: {SelfGiftResults},
   props: {
     currentUserName: String,
-    allUsers: Array
+    allUsers: Array as PropType<typeof User[]>
   },
   data() {
     return {
@@ -68,19 +80,19 @@ export default {
   methods: {},
   computed: {
     viewResultsUser: function () {
-      return this.allUsers.find((user) => user.name === this.viewResultsUserName)
+      return this.allUsers!.find((user: typeof User) => user.name === this.viewResultsUserName)
     },
     unassignedGifts: function () {
-      return this.viewResultsUser.gifts.filter((gift) => !gift.assignedUserName)
+      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => !gift.assignedUserName)
     },
 
     assignedGifts: function () {
-      return this.viewResultsUser.gifts.filter((gift) => gift.assignedUserName)
+      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => gift.assignedUserName)
     }
   },
   created() {
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
