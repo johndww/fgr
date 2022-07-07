@@ -3,16 +3,16 @@
     <h1 class="text-center my-3 pb-3">Gifting Results</h1>
     <div class="tabbable tabs-left">
       <ul class="nav nav-tabs">
-        <li v-for="user in allUsers" :key="user.name">
+        <li v-for="user in eventUsers" :key="user.id">
           <button
-              :class="user.name === this.viewResultsUserName ? (this.currentUserName === user.name ? 'btn btn-warning' : 'btn btn-primary') : 'btn btn-secondary'"
-              @click="this.viewResultsUserName = user.name">{{ user.name }}
+              :class="user.id === this.viewResultsUserId ? (this.currentUserId === user.id ? 'btn btn-warning' : 'btn btn-primary') : 'btn btn-secondary'"
+              @click="this.viewResultsUserId = user.id">{{ user.name }}
           </button>
         </li>
       </ul>
     </div>
 
-    <template v-if="this.viewResultsUser && this.currentUserName !== this.viewResultsUserName">
+    <template v-if="this.viewResultsUser && this.currentUserId !== this.viewResultsUserId">
       <div class="tab-content">
         <table class="table mb-4">
           <tbody>
@@ -20,7 +20,7 @@
             <td>{{ gift.name }}</td>
             <td>
               <button
-                  @click="$emit('assign-gift', {giftId: gift.id, forUserName: this.viewResultsUserName, byUserName: this.currentUserName})"
+                  @click="$emit('assign-gift', {giftId: gift.id, forUserId: this.viewResultsUserId, byUserId: this.currentUserId})"
                   class="btn btn-primary">
                 Claim Gift
               </button>
@@ -29,10 +29,10 @@
 
           <tr v-for="gift in assignedGifts" :key="gift.name">
             <td>{{ gift.name }}</td>
-            <template v-if="gift.assignedUserName === this.currentUserName">
+            <template v-if="gift.assignedUserId === this.currentUserId">
               <td>
                 <button class="btn btn-warning"
-                        @click="$emit('release-gift', {giftId: gift.id, forUserName: this.viewResultsUserName})">
+                        @click="$emit('release-gift', {giftId: gift.id, forUserId: this.viewResultsUserId})">
                   Release Gift
                 </button>
               </td>
@@ -47,7 +47,7 @@
     <SelfGiftResults @add-gift="(giftToAdd) => $emit('add-gift', giftToAdd)"
                      @delete-gift="(giftId) => $emit('delete-gift', giftId)"
                      :viewResultsUser="this.viewResultsUser"
-                     v-if="this.viewResultsUser && this.currentUserName === this.viewResultsUserName"/>
+                     v-if="this.viewResultsUser && this.currentUserId === this.viewResultsUserId"/>
 
   </div>
 </template>
@@ -64,30 +64,31 @@ export default defineComponent({
   name: "GiftResults",
   components: {SelfGiftResults},
   props: {
-    currentUserName: String,
-    allUsers: Array as PropType<typeof User[]>
+    currentUserId: String,
+    eventUsers: Array as PropType<typeof User[]>
   },
   data() {
     return {
-      viewResultsUserName: this.currentUserName,
+      viewResultsUserId: this.currentUserId,
     }
   },
   watch: {
-    currentUserName: function () {
-      this.viewResultsUserName = this.currentUserName
+    currentUserId: function () {
+      this.viewResultsUserId = this.currentUserId
     }
   },
   methods: {},
   computed: {
     viewResultsUser: function () {
-      return this.allUsers!.find((user: typeof User) => user.name === this.viewResultsUserName)
+      return this.eventUsers!.find((user: typeof User) => user.id === this.viewResultsUserId)
     },
+
     unassignedGifts: function () {
-      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => !gift.assignedUserName)
+      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => !gift.assignedUserId)
     },
 
     assignedGifts: function () {
-      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => gift.assignedUserName)
+      return this.viewResultsUser!.gifts.filter((gift: typeof Gift) => gift.assignedUserId)
     }
   },
   created() {

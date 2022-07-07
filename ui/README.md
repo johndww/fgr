@@ -1,4 +1,4 @@
-# todo-list-vue
+# fgr ui
 
 ## Project setup
 ```

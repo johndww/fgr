@@ -7,12 +7,14 @@
           <div class="card rounded-3">
             <div class="card-body p-4">
 
-              <div v-show="currentUserName" style="text-align: right">
-                {{ currentUserName }}
+              <div v-show="currentUserId" style="text-align: right">
+                {{ currentUserId }}
               </div>
-              <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserName"
+              <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserId"
                           :allUsers="allUsers"/>
-              <GiftResults v-show="currentUserName" :currentUserName="currentUserName" :allUsers="allUsers"
+              <SelectEvent @event-selection="eventSelection" @event-creation="createEvent" v-if="currentUserId && !selectedEventId"
+                          :allEvents="allEvents"/>
+              <GiftResults v-if="currentUserId && selectedEventId" :currentUserId="currentUserId" :eventUsers="eventUsers"
                            @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift"
                            @release-gift="releaseGift"/>
 
@@ -28,42 +30,65 @@
 
 <script lang="ts">
 import SelectUser from './components/SelectUser.vue';
+import SelectEvent from './components/SelectEvent.vue';
 import GiftResults from "./components/GiftResults.vue";
 import { defineComponent } from "vue";
 
 declare interface User {
+  id: string,
   name: string,
   gifts: Gift[]
+  eventIds: string[] // joiner, not persisted like this todo
+}
+
+declare interface Event {
+  id: string,
+  name: string,
+  ownerUserId: string
 }
 
 declare interface Gift {
   id: string
   name: string
-  assignedUserName?: string
+  assignedUserId?: string
 }
+
+export { User, Event, Gift }
 
 export default defineComponent({
   name: 'App',
   props: {},
   data() {
     return {
-      currentUserName: "",
+      currentUserId: "",
+      selectedEventId: "",
       allUsers: [] as User[],
+      allEvents: [] as Event[],
     }
   },
   methods: {
-    userSelection(userName: string) {
-      this.currentUserName = userName
+    userSelection(userId: string) {
+      this.currentUserId = userId
+    },
+
+    eventSelection(eventId: string) {
+      this.selectedEventId = eventId
     },
 
     createUser(userName: string) {
-      this.currentUserName = userName
-      this.allUsers = [...this.allUsers, {name: userName, gifts: []}]
+      this.currentUserId = Math.floor(Math.random() * 1000).toString()
+      this.allUsers = [...this.allUsers, {id: this.currentUserId, name: userName, gifts: [], eventIds: []}]
     },
-    assignGift(details: { forUserName: string; giftId: string; byUserName: string; }) {
-      const user = this.allUsers.find((user) => user.name === details.forUserName) || null
+
+    createEvent(eventName: string) {
+      this.selectedEventId = Math.floor(Math.random() * 1000).toString()
+      this.allEvents = [...this.allEvents, {id: "", name: eventName, ownerUserId: this.currentUserId}]
+    },
+
+    assignGift(details: { forUserId: string; giftId: string; byUserId: string; }) {
+      const user = this.allUsers.find((user) => user.id === details.forUserId) || null
       if (user == null) {
-        console.log("unable to assign gift. cannot find user: " + details.forUserName)
+        console.log("unable to assign gift. cannot find user: " + details.forUserId)
         return
       }
 
@@ -72,26 +97,29 @@ export default defineComponent({
         console.log("unable to assign gift. cannot find gift: " + details.giftId)
         return
       }
-      gift.assignedUserName = details.byUserName
+      gift.assignedUserId = details.byUserId
     },
+
     addGift(giftName: string) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserName) || null
+      const user = this.allUsers.find((user) => user.name === this.currentUserId) || null
       if (user == null) {
-        console.log("unable to add gift. cannot find user: " + this.currentUserName)
+        console.log("unable to add gift. cannot find user: " + this.currentUserId)
         return
       }
 
-      user.gifts = [...user.gifts, {id: Math.floor(Math.random() * 1000).toString(), name: giftName, assignedUserName: ""}]
+      user.gifts = [...user.gifts, {id: Math.floor(Math.random() * 1000).toString(), name: giftName, assignedUserId: ""}]
     },
+
     deleteGift(giftId: string) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserName) || null
+      const user = this.allUsers.find((user) => user.name === this.currentUserId) || null
       if (user == null) {
-        console.log("unable to delete gift. cannot find user: " + this.currentUserName)
+        console.log("unable to delete gift. cannot find user: " + this.currentUserId)
         return
       }
 
       user.gifts = user.gifts.filter((gift) => gift.id !== giftId)
     },
+
     releaseGift(details: { forUserName: string; giftId: string; }) {
       const user = this.allUsers.find((user) => user.name === details.forUserName) || null
       if (user == null) {
@@ -105,22 +133,43 @@ export default defineComponent({
         return
       }
 
-      gift.assignedUserName = undefined
+      gift.assignedUserId = undefined
     }
+  },
+  computed: {
+    eventUsers: function (): User[] {
+      let filteredUsers = this.allUsers.filter((user) =>  user.eventIds.includes(this.selectedEventId))
+      return filteredUsers
+    },
   },
   components: {
     GiftResults,
-    SelectUser
+    SelectUser,
+    SelectEvent
   },
   created() {
+    this.allEvents = [
+      {
+        id: "1",
+        name: "2020 Wright's Christmas",
+        ownerUserId: "1",
+      },
+      {
+        id: "2",
+        name: "2021 Tapa's Thanksgiving",
+        ownerUserId: "2",
+      },
+    ]
+
     this.allUsers = [
       {
+        id: "1",
         name: "John",
         gifts: [
           {
             id: "1",
             name: "Xbox",
-            assignedUserName: "Haritha"
+            assignedUserId: "2"
           },
           {
             id: "2",
@@ -130,10 +179,12 @@ export default defineComponent({
             id: "3",
             name: "Gamecube"
           }
-        ]
+        ],
+        eventIds: ["1","2"]
       },
       {
         name: "Haritha",
+        id: "2",
         gifts: [
           {
             id: "4",
@@ -142,24 +193,28 @@ export default defineComponent({
           {
             id: "5",
             name: "Ski goggles",
-            assignedUserName: "John"
+            assignedUserId: "1"
           },
           {
             id: "6",
             name: "Hat"
           }
-        ]
+        ],
+        eventIds: ["1","2"]
       },
       {
+        id: "3",
         name: "Sue",
         gifts: [
           {
             id: "7",
             name: "Skis"
           }
-        ]
+        ],
+        eventIds: ["1"]
       },
       {
+        id: "4",
         name: "Bruce",
         gifts: [
           {
@@ -169,9 +224,10 @@ export default defineComponent({
           {
             id: "9",
             name: "beer",
-            assignedUserName: "Sue"
+            assignedUserId: "3"
           },
-        ]
+        ],
+        eventIds: ["1"]
       }
     ]
   }

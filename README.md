@@ -31,15 +31,15 @@ login to be able to see claimed gifts & to claim gifts
 - [ ] Logout
 
 ### Create Event
-- [ ] capture event name and description
+- [x] capture event details
 - [ ] add members
     - [ ] by email 
     - [ ] or by previous association
 
 ### Show Event
-- [ ] display all members & gifts
-- [ ] ability to claim and unclaim gifts
-- [ ] add/remove your gift requests
+- [x] display all members & gifts
+- [x] ability to claim and unclaim gifts
+- [x] add/remove your gift requests
 - [ ] event owner controls
   - [ ] delete event (with confirmation)
   - [ ] update event details (& membership)
@@ -48,7 +48,7 @@ login to be able to see claimed gifts & to claim gifts
 
 * event 
     - id
-    - owner
+    - ownerUserId
     - name
 
 * users

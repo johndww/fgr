@@ -3,22 +3,23 @@
     <h1 class="text-center my-3 pb-3">Who are you?</h1>
 
     <ul>
-      <li v-for="user in allUsers" :key="user.name"><button @click="$emit('user-selection', user.name)">{{ user.name }}</button></li>
+      <li v-for="user in allUsers" :key="user.name"><button @click="$emit('user-selection', user.id)">{{ user.name }}</button></li>
     </ul>
     <form @submit="onCreateUser">
-      <input name="name" v-model="createdUser"> <button type="submit">Join Registry</button>
+      <input name="name" v-model="createdUserName"> <button type="submit">Join Registry</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
 
-import { defineComponent } from "vue";
+import {defineComponent, PropType} from "vue";
+import User from "App.vue";
 
 export default defineComponent({
   name: "SelectUser",
   props: {
-    allUsers: []
+    allUsers: Array as PropType<typeof User[]>,
   },
   data() {
     return {
