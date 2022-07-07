@@ -8,7 +8,7 @@
             <div class="card-body p-4">
 
               <div v-show="currentUserId" style="text-align: right">
-                {{ currentUserId }}
+                {{ currentUserName }}
               </div>
               <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserId"
                           :allUsers="allUsers"/>
@@ -32,7 +32,7 @@
 import SelectUser from './components/SelectUser.vue';
 import SelectEvent from './components/SelectEvent.vue';
 import GiftResults from "./components/GiftResults.vue";
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 
 declare interface User {
   id: string,
@@ -101,7 +101,7 @@ export default defineComponent({
     },
 
     addGift(giftName: string) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserId) || null
+      const user = this.allUsers.find((user) => user.id === this.currentUserId) || null
       if (user == null) {
         console.log("unable to add gift. cannot find user: " + this.currentUserId)
         return
@@ -111,7 +111,7 @@ export default defineComponent({
     },
 
     deleteGift(giftId: string) {
-      const user = this.allUsers.find((user) => user.name === this.currentUserId) || null
+      const user = this.allUsers.find((user) => user.id === this.currentUserId) || null
       if (user == null) {
         console.log("unable to delete gift. cannot find user: " + this.currentUserId)
         return
@@ -120,10 +120,10 @@ export default defineComponent({
       user.gifts = user.gifts.filter((gift) => gift.id !== giftId)
     },
 
-    releaseGift(details: { forUserName: string; giftId: string; }) {
-      const user = this.allUsers.find((user) => user.name === details.forUserName) || null
+    releaseGift(details: { forUserId: string; giftId: string; }) {
+      const user = this.allUsers.find((user) => user.id === details.forUserId) || null
       if (user == null) {
-        console.log("unable to release gift. cannot find user: " + details.forUserName)
+        console.log("unable to release gift. cannot find user: " + details.forUserId)
         return
       }
 
@@ -138,8 +138,10 @@ export default defineComponent({
   },
   computed: {
     eventUsers: function (): User[] {
-      let filteredUsers = this.allUsers.filter((user) =>  user.eventIds.includes(this.selectedEventId))
-      return filteredUsers
+      return this.allUsers.filter((user) => user.eventIds.includes(this.selectedEventId))
+    },
+    currentUserName: function (): User[] {
+      return this.allUsers.filter((user) => user.id === this.currentUserId)
     },
   },
   components: {
