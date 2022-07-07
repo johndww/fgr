@@ -3,7 +3,7 @@
     <h1 class="text-center my-3 pb-3">Select Event</h1>
 
     <ul>
-      <li v-for="event in allEvents" :key="event.id"><button @click="$emit('event-selection', event.id)">{{ event.name }}</button></li>
+      <li v-for="event in myEvents" :key="event.id"><button @click="$emit('event-selection', event.id)">{{ event.name }}</button></li>
     </ul>
     <form @submit="onCreateEvent">
       <input name="name" v-model="eventNameToCreate"> <button type="submit">Create Event</button>
@@ -15,15 +15,22 @@
 
 import {defineComponent, PropType} from "vue";
 import Event from "App.vue";
+import User from "App.vue";
 
 export default defineComponent({
   name: "SelectEvent",
   props: {
     allEvents: Array as PropType<typeof Event[]>,
+    currentUser: Object as PropType<typeof User>
   },
   data() {
     return {
       eventNameToCreate: ''
+    }
+  },
+  computed: {
+    myEvents: function (): typeof Event[] {
+      return this.allEvents!.filter((event) => this.currentUser!.eventIds.includes(event.id))
     }
   },
   methods: {

@@ -8,7 +8,7 @@ basic gift registry
 - UI: Vue
 - Backend: Golang HTTP server
 - DB: ???
-- Deployment: ??? (digitial ocean droplet & postgres likely)
+- Deployment: ??? (digital ocean droplet & postgres likely)
 
 ### Starting UI
 - npm install
@@ -26,7 +26,7 @@ login to be able to see claimed gifts & to claim gifts
 - [ ] website explanation
 
 ### Authenticated Home Page
-- [ ] Show all events you are linked to
+- [x] Show all events you are linked to
 - [ ] Create Event button
 - [ ] Logout
 

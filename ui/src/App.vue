@@ -8,12 +8,12 @@
             <div class="card-body p-4">
 
               <div v-show="currentUserId" style="text-align: right">
-                {{ currentUserName }}
+                {{ currentUser != null && currentUser.name }}
               </div>
               <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserId"
                           :allUsers="allUsers"/>
               <SelectEvent @event-selection="eventSelection" @event-creation="createEvent" v-if="currentUserId && !selectedEventId"
-                          :allEvents="allEvents"/>
+                          :allEvents="allEvents" :currentUser="currentUser"/>
               <GiftResults v-if="currentUserId && selectedEventId" :currentUserId="currentUserId" :eventUsers="eventUsers"
                            @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift"
                            @release-gift="releaseGift"/>
@@ -140,8 +140,8 @@ export default defineComponent({
     eventUsers: function (): User[] {
       return this.allUsers.filter((user) => user.eventIds.includes(this.selectedEventId))
     },
-    currentUserName: function (): User[] {
-      return this.allUsers.filter((user) => user.id === this.currentUserId)
+    currentUser: function (): User | null {
+      return this.allUsers.find((user) => user.id === this.currentUserId) || null
     },
   },
   components: {
