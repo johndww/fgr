@@ -3,7 +3,7 @@
     <h1 class="text-center my-3 pb-3">Who are you?</h1>
 
     <ul>
-      <li v-for="user in allUsers" :key="user.name"><button @click="$emit('user-selection', user.id)">{{ user.name }}</button></li>
+      <li v-for="user in allUsers" :key="user.name"><button @click="selectUser(user.id)">{{ user.name }}</button></li>
     </ul>
     <form @submit="onCreateUser">
       <input name="name" v-model="createdUserName"> <button type="submit">Join Registry</button>
@@ -13,13 +13,12 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType} from "vue";
-import User from "App.vue";
+import {defineComponent} from "vue";
+import {createUser, getAllUsers, login} from "../state/store";
 
 export default defineComponent({
   name: "SelectUser",
   props: {
-    allUsers: Array as PropType<typeof User[]>,
   },
   data() {
     return {
@@ -36,8 +35,19 @@ export default defineComponent({
       }
 
       //TODO prevent dup names
+      //TODO remember where you came from before login
+      createUser(this.createdUserName)
+      this.$router.push('/')
+    },
 
-      this.$emit('user-creation', this.createdUserName)
+    selectUser(id: string) {
+      login(id)
+      this.$router.push('/')
+    }
+  },
+  computed: {
+    allUsers: function () {
+      return getAllUsers()
     }
   }
 })

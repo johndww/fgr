@@ -3,7 +3,7 @@
     <h1 class="text-center my-3 pb-3">Select Event</h1>
 
     <ul>
-      <li v-for="event in myEvents" :key="event.id"><button @click="$emit('event-selection', event.id)">{{ event.name }}</button></li>
+      <li v-for="event in myEvents" :key="event.id"><button @click="selectedEvent(event.id)">{{ event.name }}</button></li>
     </ul>
     <form @submit="onCreateEvent">
       <input name="name" v-model="eventNameToCreate"> <button type="submit">Create Event</button>
@@ -13,15 +13,12 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType} from "vue";
-import Event from "App.vue";
-import User from "App.vue";
+import {defineComponent} from "vue";
+import {createEvent, getMyEvents} from "../state/store";
 
 export default defineComponent({
   name: "SelectEvent",
   props: {
-    allEvents: Array as PropType<typeof Event[]>,
-    currentUser: Object as PropType<typeof User>
   },
   data() {
     return {
@@ -29,8 +26,8 @@ export default defineComponent({
     }
   },
   computed: {
-    myEvents: function (): typeof Event[] {
-      return this.allEvents!.filter((event) => this.currentUser!.eventIds.includes(event.id))
+    myEvents: function () {
+      return getMyEvents()
     }
   },
   methods: {
@@ -44,7 +41,12 @@ export default defineComponent({
 
       //TODO prevent dup names
 
-      this.$emit('event-creation', this.eventNameToCreate)
+      let eventId = createEvent(this.eventNameToCreate)
+      this.$router.push({path: "/event", query: {id: eventId}})
+    },
+
+    selectedEvent(eventId: string) {
+      this.$router.push({path: "/event", query: {id: eventId}})
     }
   }
 })
