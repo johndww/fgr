@@ -37,12 +37,12 @@ export default defineComponent({
       //TODO prevent dup names
       //TODO remember where you came from before login
       createUser(this.createdUserName)
-      this.$router.push('/selectevent')
+      this.$router.push({ name: 'selectevent'})
     },
 
     selectUser(id: string) {
       login(id)
-      this.$router.push('/selectevent')
+      this.$router.push({ name: 'selectevent'})
     }
   },
   computed: {

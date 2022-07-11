@@ -26,7 +26,7 @@ login to be able to see claimed gifts & to claim gifts
 - [x] Welcome page (unauthenticated)
 
 ### Navigation
-- [ ] General Navigation
+- [x] General Navigation
 - [ ] Back button (breadcrumbs?)
 
 ### Authenticated Home Page

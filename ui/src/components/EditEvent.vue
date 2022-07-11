@@ -64,8 +64,8 @@ export default defineComponent({
   },
   data() {
     return {
-      event: getEvent(this.$route.query.id)!,
-      eventUsers: getEventUsers(this.$route.query.id),
+      event: getEvent(this.$route.params.id)!,
+      eventUsers: getEventUsers(this.$route.params.id),
       eventName: "",
       updateUserList: [{email: ""}],
     }
@@ -88,7 +88,7 @@ export default defineComponent({
       })
 
       persistUpdateEvent(this.event.id, this.eventName, Array.from(uniqueEmails) as string[])
-      this.$router.push({path: '/event', query: {id: this.event.id}})
+      this.$router.push({name: 'viewevent', params: {id: this.event.id}})
     },
 
     deleteUser(userIdx: number) {

@@ -5,9 +5,20 @@
         <div class="col col-lg-9 col-xl-7">
           <div class="card rounded-3">
             <div class="card-body p-4">
-              <div v-show="currentUser" style="text-align: right">
-                {{ currentUser != null && currentUser.name }}
+
+              <div v-show="currentUser">
+                <nav class="navbar navbar-light bg-light">
+                  <div class="container-fluid">
+                    <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>
+
+                    <div style="text-align: right">
+                      {{ currentUser != null && currentUser.name }}
+                    </div>
+                  </div>
+                </nav>
               </div>
+
+
               <router-view></router-view>
             </div>
           </div>
@@ -16,13 +27,6 @@
     </div>
   </div>
 
-<!--      <SelectUser @user-selection="userSelection" @user-creation="createUser" v-show="!currentUserId"-->
-<!--                  :allUsers="allUsers"/>-->
-<!--      <SelectEvent @event-selection="eventSelection" @event-creation="createEvent" v-if="currentUserId && !selectedEventId"-->
-<!--                  :allEvents="allEvents" :currentUser="currentUser"/>-->
-<!--      <ViewEvent v-if="currentUserId && selectedEventId" :currentUserId="currentUserId" :eventUsers="eventUsers" :event="event"-->
-<!--                   @assign-gift="assignGift" @add-gift="addGift" @delete-gift="deleteGift"-->
-<!--                   @release-gift="releaseGift"/>-->
 </template>
 
 <script lang="ts">

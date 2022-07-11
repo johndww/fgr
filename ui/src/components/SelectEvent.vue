@@ -41,12 +41,12 @@ export default defineComponent({
 
       //TODO prevent dup names
 
-      let eventId = createEvent(this.eventNameToCreate)
-      this.$router.push({path: "/event", query: {id: eventId}})
+      const eventId = createEvent(this.eventNameToCreate)
+      this.$router.push({name: "viewevent", params: { id: eventId }})
     },
 
     selectedEvent(eventId: string) {
-      this.$router.push({path: "/event", query: {id: eventId}})
+      this.$router.push({name: "viewevent", params: { id: eventId }})
     }
   }
 })

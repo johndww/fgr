@@ -76,13 +76,13 @@ export default defineComponent({
   data() {
     return {
       viewResultsUserId: getSessionUserId().value,
-      event: getEvent(this.$route.query.id)!,
-      eventUsers: getEventUsers(this.$route.query.id),
+      event: getEvent(this.$route.params.id)!,
+      eventUsers: getEventUsers(this.$route.params.id),
     }
   },
   methods: {
     editEvent() {
-      this.$router.push({path: '/editevent', query: {id: this.event.id}})
+      this.$router.push({name: 'editevent'})
     },
 
     assignGift(giftId: string, byUserId: string) {
