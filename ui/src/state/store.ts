@@ -1,4 +1,5 @@
 import {reactive, ref} from "vue";
+import {Event, GiftRequest, User} from "@/App.vue";
 
 let sessionUserId = ref("")
 
@@ -36,27 +37,27 @@ export function isLoggedIn(): boolean {
     return sessionUserId.value != ""
 }
 
-export function getAllUsers() {
+export function getAllUsers(): User[] {
     return allUsers
 }
 
-export function getEvent(id: any) {
-    return allEvents.find((event) => event.id === id)
+export function getEvent(id: any): Event | null {
+    return allEvents.find((event) => event.id === id) || null
 }
 
-export function getMyEvents() {
+export function getMyEvents(): Event[] {
     return memberships
         .filter(membership => membership.userId == getSessionUserId().value)
         .map(membership => allEvents.find(event => event.id == membership.eventId)!)
 }
 
-export function getEventUsers(eventId: any) {
+export function getEventUsers(eventId: any): User[] {
     return memberships
         .filter(membership => membership.eventId == eventId)
         .map(membership => allUsers.find(user => user.id == membership.userId)!)
 }
 
-export function getGiftRequests(eventId: string) {
+export function getGiftRequests(eventId: string): GiftRequest[] {
     return giftRequests.filter(request => request.eventId == eventId)
 }
 
@@ -72,7 +73,7 @@ export function persistGiftRequest(giftName: string, eventId: string) {
 }
 
 export function persistDeleteGiftRequest(giftId: string) {
-    const idx = giftRequests.findIndex(request => request.id = giftId)
+    const idx = giftRequests.findIndex(request => request.id == giftId)
     giftRequests.splice(idx, 1)
 }
 
@@ -178,7 +179,7 @@ export function persistUpdateEvent(id: string, name: string, memberEmails: strin
     })
 }
 
-let allEvents = [
+let allEvents = reactive([
     {
         id: "1",
         name: "2020 Wright's Christmas",
@@ -189,7 +190,7 @@ let allEvents = [
         name: "2021 Tapa's Thanksgiving",
         ownerUserId: "2",
     },
-]
+])
 
 let allUsers = reactive([
     {

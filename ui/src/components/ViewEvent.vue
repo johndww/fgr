@@ -66,7 +66,7 @@ import {
   persistGiftRequest,
   persistReleaseGift
 } from "../state/store";
-import {Gift, User} from "../App.vue";
+import {GiftRequest, User} from "../App.vue";
 
 export default defineComponent({
   name: "ViewEvent",
@@ -110,11 +110,11 @@ export default defineComponent({
       return this.eventUsers.find(user => user.id === this.viewResultsUserId) || null
     },
 
-    unassignedGifts: function (): Gift[] | null {
+    unassignedGifts: function (): GiftRequest[] | null {
       return getGiftRequests(this.event.id).filter(request => request.userId == this.viewResultsUserId && !request.assignedUserId)
     },
 
-    assignedGifts: function (): Gift[] | null {
+    assignedGifts: function (): GiftRequest[] | null {
       return getGiftRequests(this.event.id).filter(request => request.userId == this.viewResultsUserId  && request.assignedUserId)
     },
   },

@@ -32,25 +32,25 @@ import ViewEvent from "./components/ViewEvent.vue";
 import {defineComponent} from "vue";
 import {getCurrentUser} from "./state/store";
 
-declare interface User {
+export interface User {
   id: string,
   name: string,
   email: string,
 }
 
-declare interface Event {
+export interface Event {
   id: string,
   name: string,
   ownerUserId: string
 }
 
-declare interface Gift {
+export interface GiftRequest {
   id: string
+  userId: string,
+  eventId: string,
   name: string
   assignedUserId: string
 }
-
-export { User, Event, Gift }
 
 export default defineComponent({
   name: 'App',
