@@ -23,7 +23,11 @@ login to be able to see claimed gifts & to claim gifts
 
 ### Unauthenticated Home Page
 - [ ] Login/Create Account
-- [ ] website explanation
+- [x] Welcome page (unauthenticated)
+
+### Navigation
+- [ ] General Navigation
+- [ ] Back button (breadcrumbs?)
 
 ### Authenticated Home Page
 - [x] Show all events you are linked to

@@ -6,9 +6,11 @@ import SelectUser from "./components/SelectUser.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import {isLoggedIn} from "./state/store";
 import EditEvent from "./components/EditEvent.vue";
+import Home from "./components/Home.vue";
 
 const routes = [
-    { path: '/', component: SelectEvent },
+    { name: 'Home', path: '/', component: Home },
+    { path: '/selectevent', component: SelectEvent },
     { name: 'Login', path: '/login', component: SelectUser },
     { path: '/event', component: ViewEvent },
     { path: '/editevent', component: EditEvent },
@@ -20,7 +22,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (!isLoggedIn() && to.name != "Login") {
+    if (!isLoggedIn() && !(to.name == "Login" || to.name == "Home")) {
         next({name: 'Login'})
     } else {
         next()
