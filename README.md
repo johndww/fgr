@@ -27,14 +27,14 @@ login to be able to see claimed gifts & to claim gifts
 
 ### Authenticated Home Page
 - [x] Show all events you are linked to
-- [ ] Create Event button
+- [x] Create Event button
 - [ ] Logout
 
 ### Create Event
 - [x] capture event details
-- [ ] add members
-    - [ ] by email 
-    - [ ] or by previous association
+- [x] add members
+    - [x] by email 
+    - [x] or by previous association
 
 ### Show Event
 - [x] display all members & gifts
@@ -42,7 +42,7 @@ login to be able to see claimed gifts & to claim gifts
 - [x] add/remove your gift requests
 - [ ] event owner controls
   - [ ] delete event (with confirmation)
-  - [ ] update event details (& membership)
+  - [x] update event details (& membership)
 
 ## DB Schema
 
@@ -57,12 +57,14 @@ login to be able to see claimed gifts & to claim gifts
     - email
 
 * membership
+    - id
     - eventId
     - userId
 
 * gift_requests
+    - id
     - userId
     - eventId
     - name
     - description
-    - claimedByUserId
+    - assignedUserId

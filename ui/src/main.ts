@@ -5,11 +5,13 @@ import {createApp} from 'vue'
 import SelectUser from "./components/SelectUser.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import {isLoggedIn} from "./state/store";
+import EditEvent from "./components/EditEvent.vue";
 
 const routes = [
     { path: '/', component: SelectEvent },
     { name: 'Login', path: '/login', component: SelectUser },
     { path: '/event', component: ViewEvent },
+    { path: '/editevent', component: EditEvent },
 ]
 
 const router = createRouter({

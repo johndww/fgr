@@ -2,7 +2,7 @@
   <div class="tab-content">
     <table class="table mb-4">
       <tbody>
-      <tr v-for="gift in this.viewResultsUser.gifts" :key="gift.name">
+      <tr v-for="gift in myGifts" :key="gift.name">
         <td>{{ gift.name }}</td>
         <td>
           <button class="btn btn-danger" @click="deleteGift(gift.id)">
@@ -35,15 +35,21 @@
 <script lang="ts">
 
 import { defineComponent } from "vue";
+import {getGiftRequests, getSessionUserId} from "../state/store";
 
 export default defineComponent({
   name: 'SelfGiftResults',
   props: {
-    viewResultsUser: Object
+    eventId: String,
   },
   data() {
     return {
       giftToAdd: '',
+    }
+  },
+  computed: {
+    myGifts() {
+      return getGiftRequests(this.eventId!).filter(request => request.userId == getSessionUserId().value)
     }
   },
   methods: {

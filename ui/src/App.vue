@@ -35,8 +35,7 @@ import {getCurrentUser} from "./state/store";
 declare interface User {
   id: string,
   name: string,
-  gifts: Gift[]
-  eventIds: string[] // joiner, not persisted like this todo
+  email: string,
 }
 
 declare interface Event {
@@ -48,7 +47,7 @@ declare interface Event {
 declare interface Gift {
   id: string
   name: string
-  assignedUserId?: string
+  assignedUserId: string
 }
 
 export { User, Event, Gift }
