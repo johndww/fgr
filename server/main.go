@@ -1,9 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"server/pkg/routes"
 )
 
 func main() {
-	fmt.Println("FGR server startup")
+	log.Println("FGR server startup")
+
+	router := mux.NewRouter()
+	routes.Define(router)
+
+	log.Fatal(http.ListenAndServe(":80", router))
 }

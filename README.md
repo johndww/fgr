@@ -70,5 +70,4 @@ login to be able to see claimed gifts & to claim gifts
     - userId
     - eventId
     - name
-    - description
     - assignedUserId
