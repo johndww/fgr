@@ -41,6 +41,27 @@ func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
 	logrus.WithField("userId", userId).Info("logged user in")
 }
 
+func (u UserGateway) LogoutHttp(w http.ResponseWriter, r *http.Request) {
+	userId, err := pkg.UserIdFromContext(r.Context())
+	if err != nil {
+		logrus.WithError(err).Error("unable to pull userid from context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sessionIdCookie := http.Cookie{
+		Name:    pkg.SessionCookieName,
+		Value:   "",
+		Path:    "/",
+		Expires: time.Now(),
+		MaxAge:  0,
+		Secure:  false, //TODO should be true when we use https
+	}
+	http.SetCookie(w, &sessionIdCookie)
+
+	logrus.WithField("userId", userId).Info("logged user out")
+}
+
 func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {
 	userId, err := pkg.UserIdFromContext(r.Context())
 	if err != nil {

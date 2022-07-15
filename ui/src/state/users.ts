@@ -118,3 +118,23 @@ export function getUsersForEvent(eventId: string, state: Ref<GetUsersForEventSta
         })
         .finally(() => state.value.loading = false)
 }
+
+export interface LogoutState extends State<string> {}
+
+export function logoutUser(state: Ref<LogoutState>): Promise<any> {
+    state.value.loading = true
+
+    return axios.post('http://localhost/logout', {}, {
+        withCredentials: true
+    })
+        .then(() => {
+            state.value.error = ""
+            currentUser.value = null
+            currentUserId.value = ""
+        })
+        .catch(err => {
+            state.value.error = "Unable to logout"
+            console.log("unable to login: " + err)
+        })
+        .finally(() => state.value.loading = false)
+}

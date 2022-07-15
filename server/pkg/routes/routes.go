@@ -14,6 +14,7 @@ func Define(router *mux.Router) {
 
 	userGw := UserGateway{}
 	router.HandleFunc("/login/{id}", userGw.LoginHttp).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/logout", userGw.LogoutHttp).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/users/me", userGw.CurrentUserHttp).Methods(http.MethodGet, http.MethodOptions)
 	router.HandleFunc("/users/create", userGw.CreateUserHttp).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/users", userGw.AllUsersHttp).Methods(http.MethodGet, http.MethodOptions)

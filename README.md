@@ -27,12 +27,12 @@ login to be able to see claimed gifts & to claim gifts
 
 ### Navigation
 - [x] General Navigation
-- [ ] Back button (breadcrumbs?)
+- [x] Back button to events
 
 ### Authenticated Home Page
 - [x] Show all events you are linked to
 - [x] Create Event button
-- [ ] Logout
+- [x] Logout
 
 ### Create Event
 - [x] capture event details

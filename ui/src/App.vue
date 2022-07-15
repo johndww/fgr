@@ -12,7 +12,7 @@
                     <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>
 
                     <div style="text-align: right">
-                      {{ currentUser().value != null && currentUser().value.name }}
+                      <a @click="logout" >{{ currentUser().value != null && currentUser().value.name }}</a>
                     </div>
                   </div>
                 </nav>
@@ -30,11 +30,9 @@
 </template>
 
 <script lang="ts">
-import SelectUser from './components/SelectUser.vue';
-import SelectEvent from './components/SelectEvent.vue';
-import ViewEvent from "./components/ViewEvent.vue";
-import {defineComponent} from "vue";
-import {useCurrentUser} from "./state/users";
+import {defineComponent, ref} from "vue";
+import {logoutUser, useCurrentUser} from "./state/users";
+import {useRouter} from "vue-router";
 
 export interface User {
   id: string,
@@ -59,22 +57,25 @@ export interface GiftRequest {
 
 export default defineComponent({
   name: 'App',
-  props: {},
-  data() {
-    return {
-    }
-  },
-  methods: {
-    currentUser() {
+  setup() {
+    const currentUser = function () {
       return useCurrentUser();
     }
-  },
-  computed: {
-  },
-  components: {
-    ViewEvent,
-    SelectUser,
-    SelectEvent
+
+    const router = useRouter()
+
+    const logoutState = ref({data: "", error: "", loading: false})
+    const logout = function () {
+      return logoutUser(logoutState).then(() => {
+        console.log("logged user out")
+        router.push({name: "login"})
+      })
+    }
+
+    return {
+      currentUser,
+      logout
+    }
   }
 })
 </script>
