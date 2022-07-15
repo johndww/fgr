@@ -6,13 +6,13 @@
           <div class="card rounded-3">
             <div class="card-body p-4">
 
-              <div v-show="currentUser">
+              <div v-show="currentUser().value">
                 <nav class="navbar navbar-light bg-light">
                   <div class="container-fluid">
                     <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>
 
                     <div style="text-align: right">
-                      {{ currentUser != null && currentUser.name }}
+                      {{ currentUser().value != null && currentUser().value.name }}
                     </div>
                   </div>
                 </nav>
@@ -34,7 +34,7 @@ import SelectUser from './components/SelectUser.vue';
 import SelectEvent from './components/SelectEvent.vue';
 import ViewEvent from "./components/ViewEvent.vue";
 import {defineComponent} from "vue";
-import {getCurrentUser} from "./state/store";
+import {useCurrentUser} from "./state/users";
 
 export interface User {
   id: string,
@@ -53,7 +53,8 @@ export interface GiftRequest {
   userId: string,
   eventId: string,
   name: string
-  assignedUserId: string
+  isAssigned: boolean
+  isAssignedToMe: boolean
 }
 
 export default defineComponent({
@@ -64,11 +65,11 @@ export default defineComponent({
     }
   },
   methods: {
+    currentUser() {
+      return useCurrentUser();
+    }
   },
   computed: {
-    currentUser: function () {
-      return getCurrentUser()
-    },
   },
   components: {
     ViewEvent,

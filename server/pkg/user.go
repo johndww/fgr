@@ -44,6 +44,20 @@ func AllUsers() []User {
 	return allUsers
 }
 
+func Users(eventId string) []User {
+	var users []User
+	for _, membership := range memberships {
+		if membership.EventId == eventId {
+			for _, user := range allUsers {
+				if user.Id == membership.UserId {
+					users = append(users, user)
+				}
+			}
+		}
+	}
+	return users
+}
+
 type User struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`

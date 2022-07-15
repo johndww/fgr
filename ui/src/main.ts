@@ -4,9 +4,9 @@ import {createRouter, createWebHashHistory} from 'vue-router';
 import {createApp} from 'vue'
 import SelectUser from "./components/SelectUser.vue";
 import ViewEvent from "./components/ViewEvent.vue";
-import {isLoggedIn} from "./state/store";
 import EditEvent from "./components/EditEvent.vue";
 import Home from "./components/Home.vue";
+import {isLoggedIn} from "./state/users";
 
 const routes = [
     {

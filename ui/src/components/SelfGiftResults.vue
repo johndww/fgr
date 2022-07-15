@@ -34,45 +34,50 @@
 
 <script lang="ts">
 
-import { defineComponent } from "vue";
-import {getGiftRequests, getSessionUserId} from "../state/store";
+import {useCurrentUserId} from "../state/users";
+import {GetGiftRequestsState} from "../state/events";
+import {computed, defineComponent, ref} from "vue";
 
 export default defineComponent({
-  name: 'SelfGiftResults',
-  props: {
-    eventId: String,
-  },
-  data() {
-    return {
-      giftToAdd: '',
-    }
-  },
-  computed: {
-    myGifts() {
-      return getGiftRequests(this.eventId!).filter(request => request.userId == getSessionUserId().value)
-    }
-  },
-  methods: {
-    addGift: function (e: any) {
+  props: ['eventId', 'giftRequestState'],
+  emits: ['add-gift', 'delete-gift'],
+  setup(props, {emit}) {
+    const currentUserId = useCurrentUserId()
+
+    const myGifts = computed(() => {
+      const giftRequestState: GetGiftRequestsState = props.giftRequestState
+      return giftRequestState.data.filter(request => request.userId == currentUserId.value)
+    })
+
+    const giftToAdd = ref("")
+    const addGift = function(e: any) {
       e.preventDefault()
 
-      if (!this.giftToAdd) {
+      if (!giftToAdd.value) {
         alert("Please enter a gift name")
         return
       }
 
       //TODO prevent dup gifts
 
-      this.$emit('add-gift', this.giftToAdd)
+      emit('add-gift', giftToAdd.value)
 
-      this.giftToAdd = ''
-    },
-    deleteGift: function (giftIdToDelete: string) {
+      giftToAdd.value = ''
+    }
+
+    const deleteGift = function (giftIdToDelete: string) {
       if (!confirm("Are you sure you want to remove this item? Others may already have already gotten this for you, but will be notified of this change")) {
         return
       }
 
-      this.$emit('delete-gift', giftIdToDelete)
+      emit('delete-gift', giftIdToDelete)
+    }
+
+    return {
+      giftToAdd,
+      myGifts,
+      addGift,
+      deleteGift
     }
   }
 })

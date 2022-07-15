@@ -13,7 +13,8 @@ type SessionMiddleware struct {
 
 func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/login") {
+		//TODO users shouldn't be here, replace with real auth
+		if strings.HasPrefix(r.URL.Path, "/login") || r.URL.Path == "/users" || r.URL.Path == "/users/create" {
 			next.ServeHTTP(w, r)
 			return
 		}

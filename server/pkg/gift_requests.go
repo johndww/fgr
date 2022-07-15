@@ -6,15 +6,16 @@ import (
 )
 
 type GiftRequestOutput struct {
-	Id         string `json:"id"`
-	UserId     string `json:"userId"`
-	EventId    string `json:"eventId"`
-	Name       string `json:"name"`
-	IsAssigned bool   `json:"isAssigned"` // will always be false if gift request is for the logged in user
+	Id             string `json:"id"`
+	UserId         string `json:"userId"`
+	EventId        string `json:"eventId"`
+	Name           string `json:"name"`
+	IsAssigned     bool   `json:"isAssigned"` // will always be false if gift request is for the logged in user
+	IsAssignedToMe bool   `json:"isAssignedToMe"`
 }
 
 func GetGiftRequestsForUser(eventId string, userId string) []GiftRequestOutput {
-	var giftRequests []GiftRequestOutput
+	giftRequests := []GiftRequestOutput{}
 	for _, request := range allGiftRequests {
 		if request.EventId == eventId {
 			if request.UserId == userId {
@@ -29,11 +30,12 @@ func GetGiftRequestsForUser(eventId string, userId string) []GiftRequestOutput {
 			} else {
 				// someone elses gift
 				giftRequests = append(giftRequests, GiftRequestOutput{
-					Id:         request.Id,
-					UserId:     request.UserId,
-					EventId:    request.EventId,
-					Name:       request.Name,
-					IsAssigned: request.AssignedUserId != "",
+					Id:             request.Id,
+					UserId:         request.UserId,
+					EventId:        request.EventId,
+					Name:           request.Name,
+					IsAssigned:     request.AssignedUserId != "",
+					IsAssignedToMe: request.AssignedUserId == userId,
 				})
 			}
 		}

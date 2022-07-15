@@ -1,56 +1,90 @@
 <template>
   <div>
     <h1 class="text-center my-3 pb-3">Who are you?</h1>
+    <div v-if="createUserState.error">{{createUserState.error}}</div>
 
-    <ul>
-      <li v-for="user in allUsers" :key="user.name"><button @click="selectUser(user.id)">{{ user.name }}</button></li>
-    </ul>
-    <form @submit="onCreateUser">
-      <input name="name" v-model="createdUserName"> <button type="submit">Join Registry</button>
-    </form>
+    <div v-if="allUsersState.data.length > 0 && !currentUser">
+      <ul>
+        <li v-for="user in allUsersState.data" :key="user.name"><button @click="selectUser(user.id)">{{ user.name }}</button></li>
+      </ul>
+      <form @submit="onCreateUser">
+        <input name="name" v-model="createUserName"> <button type="submit">Join Registry</button>
+      </form>
+    </div>
+    <div v-if="currentUser">
+      Already logged in! <router-link :to="{name: 'selectevent'}">Events</router-link>
+    </div>
+    <LoadingOrError :loading="allUsersState.loading" :error="allUsersState.error"></LoadingOrError>
   </div>
 </template>
 
 <script lang="ts">
 
-import {defineComponent} from "vue";
-import {createUser, getAllUsers, login} from "../state/store";
+import {Ref, ref} from "vue";
+import {
+  createUser,
+  fetchCurrentUser,
+  login,
+  useCurrentUser,
+  useAllUsers, CreateUserState,
+} from "../state/users";
+import {useRouter} from "vue-router";
+import LoadingOrError from "./LoadingOrError.vue";
 
-export default defineComponent({
-  name: "SelectUser",
-  props: {
-  },
-  data() {
-    return {
-      createdUserName: ''
-    }
-  },
-  methods: {
-    onCreateUser(e: any) {
+export default {
+  components: {LoadingOrError},
+  setup() {
+    const allUsersState = useAllUsers()
+    allUsersState.value.fetch()
+
+    const createUserName = ref("")
+    const currentUser = useCurrentUser()
+    fetchCurrentUser()
+
+    const router = useRouter()
+
+    const createUserState: Ref<CreateUserState> = ref({
+      userId: '',
+      error: '',
+      loading: false,
+    })
+
+    const onCreateUser = function(e: any) {
       e.preventDefault()
 
-      if (!this.createdUserName) {
+      if (!createUserName) {
         alert("Please enter a username")
         return
       }
 
-      //TODO prevent dup names
       //TODO remember where you came from before login
-      createUser(this.createdUserName)
-      this.$router.push({ name: 'selectevent'})
-    },
+      const promise = createUser(createUserName.value, createUserState)
 
-    selectUser(id: string) {
-      login(id)
-      this.$router.push({ name: 'selectevent'})
+      promise.then(() => {
+        let loginPromise = login(createUserState.value.userId)
+        loginPromise.then(() => {
+          router.push({ name: 'selectevent'})
+        }).catch(err => console.log("unable to login user: " + err))
+      })
+    }
+
+    const selectUser = function(id: string) {
+      login(id).then(() => {
+        router.push({ name: 'selectevent'})
+      })
+      .catch(err => console.log("unable to login user: " + err))
+    }
+
+    return {
+      allUsersState,
+      createUserName,
+      createUserState,
+      currentUser,
+      onCreateUser,
+      selectUser
     }
   },
-  computed: {
-    allUsers: function () {
-      return getAllUsers()
-    }
-  }
-})
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

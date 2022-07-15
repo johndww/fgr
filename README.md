@@ -13,7 +13,7 @@ basic gift registry
 ### Starting UI
 - npm install
 - npm install -g @vue/cli
-- npm run serve
+- npm run dev
 
 ### Backend
 

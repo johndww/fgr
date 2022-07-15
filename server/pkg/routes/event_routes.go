@@ -75,6 +75,10 @@ func (u EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type EventsOutput struct {
+	Events []pkg.Event `json:"events"`
+}
+
 func (u EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {
 	userId, err := pkg.UserIdFromContext(r.Context())
 	if err != nil {
@@ -84,7 +88,9 @@ func (u EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	events := pkg.GetEventsForUser(userId)
-	err = WriteResponse(w, events)
+
+	output := EventsOutput{Events: events}
+	err = WriteResponse(w, output)
 	if err != nil {
 		logrus.WithError(err).Error("unable to write response")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -115,7 +121,7 @@ func (u EventGateway) UpdateEventHttp(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	err = pkg.UpdateEvent(eventId, userId, input.Name, input.Emails)
 
 	if err != nil {

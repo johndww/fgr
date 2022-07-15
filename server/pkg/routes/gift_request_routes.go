@@ -22,7 +22,13 @@ func (u GiftRequestGateway) GetGiftRequestsHttp(w http.ResponseWriter, r *http.R
 	}
 
 	giftRequests := pkg.GetGiftRequestsForUser(eventId, userId)
-	err = WriteResponse(w, giftRequests)
+
+	err = WriteResponse(w, struct {
+		Gifts []pkg.GiftRequestOutput `json:"gifts"`
+	}{
+		Gifts: giftRequests,
+	})
+
 	if err != nil {
 		logrus.WithError(err).Error("unable to write response")
 		w.WriteHeader(http.StatusInternalServerError)

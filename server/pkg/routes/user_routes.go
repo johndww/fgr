@@ -49,16 +49,6 @@ func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	pathUserId := vars["id"]
-
-	if pathUserId != userId {
-		// only allow user lookups for current user for now
-		logrus.WithField("loggedInUser", userId).WithField("pathUser", pathUserId).Error("not allowed to lookup other users")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	user := pkg.GetUser(userId)
 
 	err = WriteResponse(w, UserOutput{*user})
@@ -104,9 +94,9 @@ func (u UserGateway) CreateUserHttp(w http.ResponseWriter, r *http.Request) {
 func (u UserGateway) AllUsersHttp(w http.ResponseWriter, r *http.Request) {
 	users := pkg.AllUsers()
 
-	output := AllUsersOutput{}
+	output := ExternalUsersOutput{}
 	for _, user := range users {
-		output.Users = append(output.Users, AllUsersUserOutput{Id: user.Id, Name: user.Name})
+		output.Users = append(output.Users, ExternalUser{Id: user.Id, Name: user.Name})
 	}
 
 	err := WriteResponse(w, output)
@@ -117,15 +107,40 @@ func (u UserGateway) AllUsersHttp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type AllUsersOutput struct {
-	Users []AllUsersUserOutput `json:"users"`
+type ExternalUsersOutput struct {
+	Users []ExternalUser `json:"users"`
 }
 
-type AllUsersUserOutput struct {
+type ExternalUser struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-func (u UserGateway) EventUsersHttp(w http.ResponseWriter, r *http.Request) {
+type EventUsersOutput struct {
+	Users []EventUser `json:"users"`
+}
 
+type EventUser struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func (u UserGateway) EventUsersHttp(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+
+	users := pkg.Users(eventId)
+
+	output := EventUsersOutput{}
+	for _, user := range users {
+		output.Users = append(output.Users, EventUser{Id: user.Id, Name: user.Name, Email: user.Email})
+	}
+
+	err := WriteResponse(w, output)
+	if err != nil {
+		logrus.WithError(err).Error("unable to write response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
