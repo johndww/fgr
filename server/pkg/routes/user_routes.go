@@ -9,13 +9,19 @@ import (
 )
 
 type UserGateway struct {
+	UserService *pkg.UserService
 }
 
 func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 
-	user := pkg.GetUser(userId)
+	user, err := u.UserService.GetUser(userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to read user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	if user == nil {
 		logrus.WithField("userId", userId).Warn("user not found for login")
@@ -70,7 +76,12 @@ func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := pkg.GetUser(userId)
+	user, err := u.UserService.GetUser(userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to read user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	err = WriteResponse(w, UserOutput{*user})
 	if err != nil {
@@ -98,7 +109,13 @@ func (u UserGateway) CreateUserHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := pkg.CreateUser(input.Name)
+	userId, err := u.UserService.CreateUser(input.Name)
+	if err != nil {
+		logrus.WithError(err).Error("unable to write user")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
 	w.WriteHeader(http.StatusCreated)
 	err = WriteResponse(w, struct {
 		UserId string `json:"userId"`
@@ -113,14 +130,19 @@ func (u UserGateway) CreateUserHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u UserGateway) AllUsersHttp(w http.ResponseWriter, r *http.Request) {
-	users := pkg.AllUsers()
+	users, err := u.UserService.AllUsers()
+	if err != nil {
+		logrus.WithError(err).Error("unable to read users")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	output := ExternalUsersOutput{}
 	for _, user := range users {
 		output.Users = append(output.Users, ExternalUser{Id: user.Id, Name: user.Name})
 	}
 
-	err := WriteResponse(w, output)
+	err = WriteResponse(w, output)
 	if err != nil {
 		logrus.WithError(err).Error("unable to write response")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -151,14 +173,19 @@ func (u UserGateway) EventUsersHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 
-	users := pkg.Users(eventId)
+	users, err := u.UserService.UsersForEvent(eventId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to read users")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	output := EventUsersOutput{}
 	for _, user := range users {
 		output.Users = append(output.Users, EventUser{Id: user.Id, Name: user.Name, Email: user.Email})
 	}
 
-	err := WriteResponse(w, output)
+	err = WriteResponse(w, output)
 	if err != nil {
 		logrus.WithError(err).Error("unable to write response")
 		w.WriteHeader(http.StatusInternalServerError)

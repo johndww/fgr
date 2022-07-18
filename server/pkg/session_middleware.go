@@ -9,6 +9,7 @@ import (
 const SessionCookieName = "sessionId"
 
 type SessionMiddleware struct {
+	Database *Database
 }
 
 func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
@@ -21,7 +22,11 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 
 		cookie, err := r.Cookie(SessionCookieName)
 		if err != nil {
-			logrus.WithError(err).Error("unable to read session cookie")
+			if r.URL.Path == "/users/me" {
+				// dont log, using this for session timeouts
+			} else {
+				logrus.WithError(err).WithField("route", r.URL.Path).Warn("unable to read session cookie")
+			}
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -29,7 +34,13 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 		sessionId := cookie.Value
 
 		//TODO sessionId should map to userid. for now, its just the userid
-		user := GetUser(sessionId)
+		user, err := s.Database.ReadUser(sessionId)
+		if err != nil {
+			logrus.WithError(err).Error("unable to read user / session id")
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
 		if user == nil {
 			logrus.WithField("sessionid", sessionId).Warn("invalid user")
 			w.WriteHeader(http.StatusForbidden)

@@ -8,13 +8,14 @@ import (
 )
 
 type EventGateway struct {
+	EventService *pkg.EventService
 }
 
 type CreateEventInput struct {
 	Name string `json:"name"`
 }
 
-func (u EventGateway) CreateEventHttp(w http.ResponseWriter, r *http.Request) {
+func (e EventGateway) CreateEventHttp(w http.ResponseWriter, r *http.Request) {
 	input := CreateEventInput{}
 	err := ReadBody(r.Body, &input)
 	if err != nil {
@@ -30,7 +31,13 @@ func (u EventGateway) CreateEventHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	eventId := pkg.CreateEvent(input.Name, userId)
+	eventId, err := e.EventService.CreateEvent(input.Name, userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to write event")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	err = WriteResponse(w, struct {
 		EventId string `json:"eventId"`
@@ -44,7 +51,7 @@ func (u EventGateway) CreateEventHttp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (u EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
+func (e EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 
@@ -55,7 +62,7 @@ func (u EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event, err := pkg.GetEventForUser(eventId, userId)
+	event, err := e.EventService.GetEventForUser(eventId, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to get event for user")
 		w.WriteHeader(http.StatusBadRequest)
@@ -79,7 +86,7 @@ type EventsOutput struct {
 	Events []pkg.Event `json:"events"`
 }
 
-func (u EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {
+func (e EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {
 	userId, err := pkg.UserIdFromContext(r.Context())
 	if err != nil {
 		logrus.WithError(err).Error("unable to pull userid from context")
@@ -87,7 +94,12 @@ func (u EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	events := pkg.GetEventsForUser(userId)
+	events, err := e.EventService.GetEventsForUser(userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to get events for user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	output := EventsOutput{Events: events}
 	err = WriteResponse(w, output)
@@ -103,7 +115,7 @@ type UpdateEventInput struct {
 	Emails []string `json:"emails"`
 }
 
-func (u EventGateway) UpdateEventHttp(w http.ResponseWriter, r *http.Request) {
+func (e EventGateway) UpdateEventHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 
@@ -122,7 +134,7 @@ func (u EventGateway) UpdateEventHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pkg.UpdateEvent(eventId, userId, input.Name, input.Emails)
+	err = e.EventService.UpdateEvent(eventId, userId, input.Name, input.Emails)
 
 	if err != nil {
 		if err != nil {

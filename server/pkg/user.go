@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 const userContextKey = "userContextKey"
@@ -20,42 +21,39 @@ func UserIdFromContext(ctx context.Context) (string, error) {
 	return userId, nil
 }
 
-func CreateUser(name string) string {
+type UserService struct {
+	Database *Database
+}
+
+func (u UserService) CreateUser(name string) (string, error) {
 	user := User{
 		Id:    uuid.New().String(),
 		Name:  name,
 		Email: name + "@Email.com",
 	}
 
-	allUsers = append(allUsers, user)
-	return user.Id
-}
-
-func GetUser(id string) *User {
-	for _, user := range allUsers {
-		if user.Id == id {
-			return &user
-		}
+	err := u.Database.WriteUser(user)
+	if err != nil {
+		return "", err
 	}
-	return nil
+	return user.Id, nil
 }
 
-func AllUsers() []User {
-	return allUsers
+func (u UserService) GetUser(id string) (*User, error) {
+	return u.Database.ReadUser(id)
 }
 
-func Users(eventId string) []User {
-	var users []User
-	for _, membership := range memberships {
-		if membership.EventId == eventId {
-			for _, user := range allUsers {
-				if user.Id == membership.UserId {
-					users = append(users, user)
-				}
-			}
-		}
+func (u UserService) AllUsers() ([]User, error) {
+	users, err := u.Database.ReadUsers()
+	if err != nil {
+		logrus.WithError(err).Error("unable to fetch all users")
+		return []User{}, err
 	}
-	return users
+	return users, nil
+}
+
+func (u UserService) UsersForEvent(eventId string) ([]User, error) {
+	return u.Database.ReadUsersForEvent(eventId)
 }
 
 type User struct {
@@ -64,25 +62,26 @@ type User struct {
 	Email string `json:"email"`
 }
 
-var allUsers = []User{
-	{
-		Id:    "1",
-		Name:  "John",
-		Email: "john.d.wright@gmail.com",
-	},
-	{
-		Id:    "2",
-		Name:  "Haritha",
-		Email: "haritha.tapa@gmail.com",
-	},
-	{
-		Id:    "3",
-		Name:  "Sue",
-		Email: "paubsue@gmail.com",
-	},
-	{
-		Id:    "4",
-		Name:  "Bruce",
-		Email: "bruce.d.wright@gmail.com",
-	},
-}
+//
+//var allUsers = []User{
+//	{
+//		Id:    "1",
+//		Name:  "John",
+//		Email: "john.d.wright@gmail.com",
+//	},
+//	{
+//		Id:    "2",
+//		Name:  "Haritha",
+//		Email: "haritha.tapa@gmail.com",
+//	},
+//	{
+//		Id:    "3",
+//		Name:  "Sue",
+//		Email: "paubsue@gmail.com",
+//	},
+//	{
+//		Id:    "4",
+//		Name:  "Bruce",
+//		Email: "bruce.d.wright@gmail.com",
+//	},
+//}

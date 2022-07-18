@@ -8,6 +8,7 @@ import (
 )
 
 type GiftRequestGateway struct {
+	EventService *pkg.EventService
 }
 
 func (u GiftRequestGateway) GetGiftRequestsHttp(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +22,12 @@ func (u GiftRequestGateway) GetGiftRequestsHttp(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	giftRequests := pkg.GetGiftRequestsForUser(eventId, userId)
+	giftRequests, err := u.EventService.GetGiftRequestsForEvent(eventId, userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to get gift requests")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	err = WriteResponse(w, struct {
 		Gifts []pkg.GiftRequestOutput `json:"gifts"`
@@ -54,10 +60,11 @@ func (u GiftRequestGateway) CreateGiftRequestHttp(w http.ResponseWriter, r *http
 		return
 	}
 
-	requestId, err := pkg.CreateGiftRequest(eventId, input.Name, userId)
+	requestId, err := u.EventService.CreateGiftRequest(eventId, input.Name, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to create gift request")
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -85,7 +92,7 @@ func (u GiftRequestGateway) DeleteGiftRequestsHttp(w http.ResponseWriter, r *htt
 		return
 	}
 
-	err = pkg.DeleteGiftRequest(requestId, eventId, userId)
+	err = u.EventService.DeleteGiftRequest(requestId, eventId, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to delete gift request")
 		w.WriteHeader(http.StatusBadRequest)
@@ -104,7 +111,7 @@ func (u GiftRequestGateway) ReleaseGiftRequestsHttp(w http.ResponseWriter, r *ht
 		return
 	}
 
-	err = pkg.ReleaseGiftRequest(requestId, eventId, userId)
+	err = u.EventService.ReleaseGiftRequest(requestId, eventId, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to release gift request")
 		w.WriteHeader(http.StatusBadRequest)
@@ -123,7 +130,7 @@ func (u GiftRequestGateway) ClaimGiftRequestsHttp(w http.ResponseWriter, r *http
 		return
 	}
 
-	err = pkg.ClaimGiftRequest(requestId, eventId, userId)
+	err = u.EventService.ClaimGiftRequest(requestId, eventId, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to claim gift request")
 		w.WriteHeader(http.StatusBadRequest)
