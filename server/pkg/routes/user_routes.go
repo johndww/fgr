@@ -12,6 +12,32 @@ type UserGateway struct {
 	UserService *pkg.UserService
 }
 
+type googleToken struct {
+	Token string `json:"token"`
+}
+
+func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
+	input := googleToken{}
+	err := ReadBody(r.Body, &input)
+
+	if err != nil {
+		logrus.WithError(err).Error("unable to read request body")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userId, err := u.UserService.GoogleLogin(input.Token)
+	if err != nil {
+		logrus.WithError(err).Error("unable to validate google id token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	u.setCookie(w, userId)
+
+	logrus.WithField("userId", userId).Info("logged user in with google")
+}
+
 func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
@@ -33,6 +59,12 @@ func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	u.setCookie(w, userId)
+
+	logrus.WithField("userId", userId).Info("logged user in")
+}
+
+func (u UserGateway) setCookie(w http.ResponseWriter, userId string) {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 
 	sessionIdCookie := http.Cookie{
@@ -43,8 +75,6 @@ func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
 		Secure:  false, //TODO should be true when we use https
 	}
 	http.SetCookie(w, &sessionIdCookie)
-
-	logrus.WithField("userId", userId).Info("logged user in")
 }
 
 func (u UserGateway) LogoutHttp(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +113,12 @@ func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user == nil {
+		logrus.WithError(err).Error("unable to find user for current user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	err = WriteResponse(w, UserOutput{*user})
 	if err != nil {
 		logrus.WithError(err).Error("unable to marshal user")
@@ -115,7 +151,7 @@ func (u UserGateway) CreateUserHttp(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	w.WriteHeader(http.StatusCreated)
 	err = WriteResponse(w, struct {
 		UserId string `json:"userId"`

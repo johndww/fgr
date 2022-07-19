@@ -59,18 +59,29 @@ export function createUser(userName: string, createUserState: Ref<CreateUserStat
         .finally(() => createUserState.value.loading = false)
 }
 
-const currentUserId = ref("")
-
 export function login(userId: string): Promise<any> {
-    return axios.post('http://localhost/login/' + userId, {}, {
+    return axios.post('http://localhost/login/user/' + userId, {}, {
         withCredentials: true
     })
         .then(() => {
-            currentUserId.value = userId
-            fetchCurrentUser()
+            return fetchCurrentUser()
         })
         .catch(err => {
             console.log("unable to login: " + err)
+        })
+}
+
+export function loginGoogle(credential: string): Promise<any> {
+    return axios.post('http://localhost/login/google', {
+        token: credential
+    }, {
+        withCredentials: true
+    })
+        .then(() => {
+            return fetchCurrentUser()
+        })
+        .catch(err => {
+            console.log("unable to login with google: " + err)
         })
 }
 
@@ -82,23 +93,40 @@ export function isLoggedIn(): boolean {
     return currentUserId.value != ""
 }
 
-const currentUser = ref<User | null>(null)
+const currentUserId = ref("")
 
-export function useCurrentUser(): Ref<User | null> {
-    return currentUser
+export interface CurrentUserState extends SharedState<User | null> {}
+
+const currentUserState: Ref<CurrentUserState> = ref({
+    data: null,
+    loading: false,
+    error: "",
+    fetch(): Promise<any> {
+        return fetchCurrentUser()
+    }
+})
+
+export function useCurrentUserState(): Ref<CurrentUserState> {
+    return currentUserState
 }
 
-export function fetchCurrentUser() {
-    axios.get("http://localhost/users/me", {
+function fetchCurrentUser(): Promise<any> {
+    console.log("fetching current user")
+    currentUserState.value.loading = true
+
+    return axios.get("http://localhost/users/me", {
         withCredentials: true,
     })
         .then(resp => {
-            currentUser.value = resp.data
+            currentUserState.value.data = resp.data
             currentUserId.value = resp.data.id
+            currentUserState.value.error = ""
         })
         .catch(err => {
             console.log("unable to fetch current user: " + err)
+            currentUserState.value.error = "Unable to fetch current user"
         })
+        .finally(() => currentUserState.value.loading = false)
 }
 
 export interface GetUsersForEventState extends State<User[]> {}
@@ -129,7 +157,7 @@ export function logoutUser(state: Ref<LogoutState>): Promise<any> {
     })
         .then(() => {
             state.value.error = ""
-            currentUser.value = null
+            currentUserState.value.data = null
             currentUserId.value = ""
         })
         .catch(err => {

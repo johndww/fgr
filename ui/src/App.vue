@@ -6,13 +6,13 @@
           <div class="card rounded-3">
             <div class="card-body p-4">
 
-              <div v-show="currentUser().value">
+              <div v-show="currentUserState().value.data">
                 <nav class="navbar navbar-light bg-light">
                   <div class="container-fluid">
                     <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>
 
                     <div style="text-align: right">
-                      <a @click="logout" >{{ currentUser().value != null && currentUser().value.name }}</a>
+                      <a @click="logout" >{{ currentUserState().value.data != null && currentUserState().value.data.name }}</a>
                     </div>
                   </div>
                 </nav>
@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
-import {logoutUser, useCurrentUser} from "./state/users";
+import {logoutUser, useCurrentUserState} from "./state/users";
 import {useRouter} from "vue-router";
 
 export interface User {
@@ -57,8 +57,8 @@ export interface GiftRequest {
 export default defineComponent({
   name: 'App',
   setup() {
-    const currentUser = function () {
-      return useCurrentUser();
+    const currentUserState = function () {
+      return useCurrentUserState();
     }
 
     const router = useRouter()
@@ -67,12 +67,12 @@ export default defineComponent({
     const logout = function () {
       return logoutUser(logoutState).then(() => {
         console.log("logged user out")
-        router.push({name: "login"})
+        router.push({name: "home"})
       })
     }
 
     return {
-      currentUser,
+      currentUserState,
       logout
     }
   }

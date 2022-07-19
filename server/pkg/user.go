@@ -2,9 +2,10 @@ package pkg
 
 import (
 	"context"
-	"errors"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/api/idtoken"
 )
 
 const userContextKey = "userContextKey"
@@ -56,32 +57,55 @@ func (u UserService) UsersForEvent(eventId string) ([]User, error) {
 	return u.Database.ReadUsersForEvent(eventId)
 }
 
+//TODO pull out to config. not really a secret, but still shouldn't be committed
+const aud = "186100627326-iqnh1vj4bbbse1i1qh24p1br61c9hgjh.apps.googleusercontent.com"
+
+func (u UserService) GoogleLogin(token string) (string, error) {
+	payload, err := idtoken.Validate(context.Background(), token, aud)
+	if err != nil {
+		return "", errors.Wrap(err, "unable to validate google jwt")
+	}
+
+	user, err := u.Database.MapExternalIdToUser(payload.Subject, GoogleAuthSource)
+	if err != nil {
+		return "", err
+	}
+
+	if user != nil {
+		return user.Id, nil
+	}
+
+	// never seen this user before. create user in context
+
+	newUser := User{
+		Id:    uuid.New().String(),
+		Name:  payload.Claims["name"].(string),
+		Email: payload.Claims["email"].(string),
+	}
+
+	logrus.WithField("externalId", payload.Subject).WithField("newUserId", newUser.Id).Info("new google login user. creating user..")
+
+	mapping := UserIdMapping{
+		UserId:     newUser.Id,
+		ExternalId: payload.Subject,
+		Source:     GoogleAuthSource,
+	}
+
+	err = u.Database.WriteExternalUser(newUser, mapping)
+	if err != nil {
+		return "", errors.Wrap(err, "unable to create new user from google login")
+	}
+	return newUser.Id, nil
+}
+
+type UserIdMapping struct {
+	UserId     string
+	ExternalId string
+	Source     AuthSource
+}
+
 type User struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
-
-//
-//var allUsers = []User{
-//	{
-//		Id:    "1",
-//		Name:  "John",
-//		Email: "john.d.wright@gmail.com",
-//	},
-//	{
-//		Id:    "2",
-//		Name:  "Haritha",
-//		Email: "haritha.tapa@gmail.com",
-//	},
-//	{
-//		Id:    "3",
-//		Name:  "Sue",
-//		Email: "paubsue@gmail.com",
-//	},
-//	{
-//		Id:    "4",
-//		Name:  "Bruce",
-//		Email: "bruce.d.wright@gmail.com",
-//	},
-//}

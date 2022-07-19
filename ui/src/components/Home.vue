@@ -4,21 +4,37 @@
   duplicating gifts to anyone or spoiling the gift surprise.</p>
 
   <p>To get started, login:</p>
-  <button type="button" @click="toHome()" class="btn btn-primary btn-block mb-4">Login</button>
+  <button type="button" @click="selectUser()" class="btn btn-primary btn-block mb-4">Select User</button>
+  <br />
+  <button type="button" @click="toLogin()" class="btn btn-primary btn-block mb-4">Login</button>
 </div>
 </template>
 
 <script lang="ts">
 
 import {defineComponent} from "vue";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   name: "Home",
-  methods: {
-    toHome() {
-      this.$router.push({
-        path: '/login',
+  setup() {
+    const router = useRouter()
+
+    const selectUser = function() {
+      router.push({
+        name: "selectuser"
       })
+    }
+
+    const toLogin = function () {
+      router.push({
+        name: 'login',
+      })
+    }
+
+    return {
+      selectUser,
+      toLogin
     }
   }
 })

@@ -1,6 +1,6 @@
 <template>
   <LoadingOrError :loading="getEventUsersState.loading" :error="getEventUsersState.error"></LoadingOrError>
-  <template v-if="currentUser && event">
+  <template v-if="currentUserState.data && event">
     <div>
       <h1 class="text-center my-3 pb-3">Edit {{ event.name }}</h1>
        <form @submit="updateEvent">
@@ -17,7 +17,7 @@
             </datalist>
             <tr>
               <td>
-                <input type="text" class="form-control" disabled v-model="currentUser.email">
+                <input type="text" class="form-control" disabled v-model="currentUserState.data.email">
               </td>
               <td></td>
             </tr>
@@ -50,7 +50,7 @@
 
 <script lang="ts">
 
-import {getUsersForEvent, useCurrentUser, useCurrentUserId} from "../state/users";
+import {getUsersForEvent, useCurrentUserState, useCurrentUserId} from "../state/users";
 import {useRoute, useRouter} from "vue-router";
 import {useMyEventsState, persistUpdateEvent} from "../state/events";
 import {computed, Ref, ref, watch, watchEffect} from "vue";
@@ -83,7 +83,7 @@ export default {
 
     const updateUserList: Ref<{ email: string }[]> = ref([])
 
-    const currentUser: Ref<User | null> = useCurrentUser()
+    const currentUserState = useCurrentUserState()
 
     const router = useRouter()
 
@@ -98,12 +98,12 @@ export default {
       let uniqueEmails = new Set()
       updateUserList.value.forEach(user => {
         // could alert them on accidentally including themselves, but easier to just silently remove that email
-        if (user.email != "" && user.email != currentUser.value!.email) {
+        if (user.email != "" && user.email != currentUserState.value.data!.email) {
           uniqueEmails.add(user.email)
         }
       })
 
-      uniqueEmails.add(currentUser.value!.email)
+      uniqueEmails.add(currentUserState.value.data!.email)
 
       const state = ref({
         data: "",
@@ -146,7 +146,7 @@ export default {
 
     const recentUsers = computed(() => {
       return allEventsUsers.value.filter(user => {
-        if (user.id === currentUser.value!.id) {
+        if (user.id === currentUserState.value.data!.id) {
           // dont show the logged in user
           return false
         }
@@ -174,7 +174,7 @@ export default {
       event,
       eventName,
       updateUserList,
-      currentUser,
+      currentUserState,
       updateEvent,
       deleteUser,
       addNewMember,

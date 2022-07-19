@@ -1,12 +1,14 @@
 import App from './App.vue'
 import SelectEvent from './components/SelectEvent.vue'
-import {createRouter, createWebHashHistory} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import {createApp} from 'vue'
 import SelectUser from "./components/SelectUser.vue";
+import Login from "./components/Login.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import EditEvent from "./components/EditEvent.vue";
 import Home from "./components/Home.vue";
 import {isLoggedIn} from "./state/users";
+import vue3GoogleLogin from 'vue3-google-login'
 
 const routes = [
     {
@@ -32,18 +34,23 @@ const routes = [
     {
         name: 'login',
         path: '/login',
+        component: Login
+    },
+    {
+        name: 'selectuser',
+        path: '/selectuser',
         component: SelectUser
     },
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes,
 })
 
 router.beforeEach((to, from, next) => {
-    if (!isLoggedIn() && !(to.name == "login" || to.name == "home")) {
-        next({name: 'login'})
+    if (!isLoggedIn() && !(to.name == "login" || to.name === "selectuser" || to.name == "home")) {
+        next({name: 'home'})
     } else {
         next()
     }
@@ -52,5 +59,8 @@ router.beforeEach((to, from, next) => {
 const app = createApp(App)
 
 app.use(router)
+app.use(vue3GoogleLogin, {
+    clientId: '186100627326-iqnh1vj4bbbse1i1qh24p1br61c9hgjh.apps.googleusercontent.com'
+})
 
 app.mount('#app')

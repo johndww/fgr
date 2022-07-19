@@ -22,7 +22,7 @@ login to be able to see claimed gifts & to claim gifts
 ## Pages
 
 ### Unauthenticated Home Page
-- [ ] Login/Create Account
+- [x] Login/Create Account
 - [x] Welcome page (unauthenticated)
 
 ### Navigation
@@ -33,6 +33,7 @@ login to be able to see claimed gifts & to claim gifts
 - [x] Show all events you are linked to
 - [x] Create Event button
 - [x] Logout
+- [x] Google Auth
 
 ### Create Event
 - [x] capture event details
@@ -47,6 +48,15 @@ login to be able to see claimed gifts & to claim gifts
 - [ ] event owner controls
   - [ ] delete event (with confirmation)
   - [x] update event details (& membership)
+  - 
+### TODO
+- [ ] Add versioning to endpoints
+- [ ] Support invited user getting claimed
+- [ ] CSRF protection
+- [ ] Invited user email is not the one they authed with
+- [ ] Session ID table
+- [ ] Restrict firewall on digital ocean (remove postgres)
+- [ ] Secret storage on digital ocean?
 
 ## DB Schema
 

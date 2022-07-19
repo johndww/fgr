@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -9,9 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
+	"strings"
+)
+
+type AuthSource string
+
+const (
+	GoogleAuthSource AuthSource = "google"
 )
 
 func NewDatabase() (*Database, error) {
+	//TODO remove this secret
 	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to connect to db")
@@ -54,6 +63,9 @@ func (d Database) ReadUser(id string) (*User, error) {
 	var email string
 	err := d.Pool.QueryRow(context.Background(), "select name, email from users where id = $1", id).Scan(&name, &email)
 	if err != nil {
+		if noRowsFoundError(err) {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "unable to read user")
 	}
 
@@ -91,6 +103,26 @@ func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
 func (d Database) WriteUser(user User) error {
 	_, err := d.Pool.Exec(context.Background(), "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", user.Id, user.Name, user.Email)
 	return err
+}
+
+func (d Database) WriteExternalUser(user User, mapping UserIdMapping) error {
+	txn, err := d.Pool.Begin(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "unable to being txn for write external user")
+	}
+	defer txn.Rollback(context.Background())
+
+	_, err = txn.Exec(context.Background(), "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", user.Id, user.Name, user.Email)
+	if err != nil {
+		return errors.Wrap(err, "unable to write into users for new external user")
+	}
+
+	_, err = txn.Exec(context.Background(), "INSERT INTO external_user_ids (user_id, external_id, source) VALUES ($1, $2, $3)", user.Id, mapping.ExternalId, mapping.Source)
+	if err != nil {
+		return errors.Wrap(err, "unable to write userid mapping")
+	}
+
+	return errors.Wrap(txn.Commit(context.Background()), "unable to commit new external user txn")
 }
 
 func (d Database) WriteEventAndMembership(event Event, membership Membership) error {
@@ -288,13 +320,13 @@ func (d Database) UpdateEvent(eventId string, userId string, name string, member
 	//memberEmailsInClause := ", ('" + strings.Join(memberEmails, "'), ('") + "')"
 	memberEmailsInClause, stateMapQueryParams := valuesClause([]string{eventId}, memberEmails)
 
-	sql := fmt.Sprintf("SELECT mem_users.id, memberships.id, i.email, users.id FROM memberships "+
+	sqlSelect := fmt.Sprintf("SELECT mem_users.id, memberships.id, i.email, users.id FROM memberships "+
 		"INNER JOIN users mem_users ON memberships.user_id = mem_users.id AND memberships.event_id = $1 "+
 		"FULL JOIN ( VALUES %s ) AS i(email) ON mem_users.email = i.email "+
 		"LEFT JOIN users ON i.email = users.email", memberEmailsInClause)
-	logrus.Infof("update sql: %s    ... params: %+v", sql, stateMapQueryParams)
+	logrus.Infof("update sql: %s    ... params: %+v", sqlSelect, stateMapQueryParams)
 
-	rows, err := txn.Query(context.Background(), sql, stateMapQueryParams...)
+	rows, err := txn.Query(context.Background(), sqlSelect, stateMapQueryParams...)
 	if err != nil {
 		return errors.Wrap(err, "unable to query event membership state map")
 	}
@@ -391,6 +423,26 @@ func (d Database) UpdateEvent(eventId string, userId string, name string, member
 	}
 
 	return errors.Wrap(txn.Commit(context.Background()), "unable to commit transaction")
+}
+
+func (d Database) MapExternalIdToUser(externalId string, source AuthSource) (*User, error) {
+	row := d.Pool.QueryRow(context.Background(), "SELECT user_id FROM external_user_ids WHERE external_id = $1 AND source = $2", externalId, source)
+
+	var userId string
+	err := row.Scan(&userId)
+	if err != nil {
+		logrus.WithField("err", err.Error()).WithField("sqlerr", sql.ErrNoRows.Error()).Error("error scanning user")
+		if noRowsFoundError(err) {
+			return nil, nil
+		}
+		return nil, errors.Wrap(err, "unable to scan userid when mapping external ids")
+	}
+
+	return d.ReadUser(userId)
+}
+
+func noRowsFoundError(err error) bool {
+	return strings.Contains(err.Error(), sql.ErrNoRows.Error()) || strings.Contains(sql.ErrNoRows.Error(), err.Error())
 }
 
 func valuesClause(initialParams []string, clauseParams []string) (string, []interface{}) {
