@@ -57,22 +57,39 @@ func (u UserService) UsersForEvent(eventId string) ([]User, error) {
 	return u.Database.ReadUsersForEvent(eventId)
 }
 
+func (u UserService) AdminLogin(userId string) (*Session, error) {
+	user, err := u.Database.ReadUser(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("could not find user to login to")
+	}
+
+	if !user.IsAdmin() {
+		return nil, errors.New("not an admin")
+	}
+
+	return u.Database.CreateSessionAndDeactivateOld(user.Id)
+}
+
 //TODO pull out to config. not really a secret, but still shouldn't be committed
 const aud = "186100627326-iqnh1vj4bbbse1i1qh24p1br61c9hgjh.apps.googleusercontent.com"
 
-func (u UserService) GoogleLogin(token string) (string, error) {
+func (u UserService) GoogleLogin(token string) (*Session, error) {
 	payload, err := idtoken.Validate(context.Background(), token, aud)
 	if err != nil {
-		return "", errors.Wrap(err, "unable to validate google jwt")
+		return nil, errors.Wrap(err, "unable to validate google jwt")
 	}
 
 	user, err := u.Database.MapExternalIdToUser(payload.Subject, GoogleAuthSource)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if user != nil {
-		return user.Id, nil
+		return u.Database.CreateSessionAndDeactivateOld(user.Id)
 	}
 
 	// never seen this user before. create user in context
@@ -93,9 +110,21 @@ func (u UserService) GoogleLogin(token string) (string, error) {
 
 	err = u.Database.WriteExternalUser(newUser, mapping)
 	if err != nil {
-		return "", errors.Wrap(err, "unable to create new user from google login")
+		return nil, errors.Wrap(err, "unable to create new user from google login")
 	}
-	return newUser.Id, nil
+	return u.Database.CreateSessionAndDeactivateOld(user.Id)
+}
+
+func (u UserService) GetCsrf(userId string) (string, error) {
+	session, err := u.Database.ReadSessionForUser(userId)
+	if err != nil {
+		return "", err
+	}
+
+	if !session.Active {
+		return "", errors.New("session is not active")
+	}
+	return session.CsrfToken, nil
 }
 
 type UserIdMapping struct {
@@ -108,4 +137,8 @@ type User struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
+}
+
+func (u User) IsAdmin() bool {
+	return true
 }

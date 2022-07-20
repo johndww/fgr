@@ -7,8 +7,8 @@ basic gift registry
 ### Stack
 - UI: Vue
 - Backend: Golang HTTP server
-- DB: ???
-- Deployment: ??? (digital ocean droplet & postgres likely)
+- DB: Postgres run on Droplet
+- Deployment: Digital Ocean Droplet
 
 ### Starting UI
 - npm install
@@ -52,11 +52,13 @@ login to be able to see claimed gifts & to claim gifts
 ### TODO
 - [ ] Add versioning to endpoints
 - [ ] Support invited user getting claimed
-- [ ] CSRF protection
+- [x] CSRF protection
 - [ ] Invited user email is not the one they authed with
-- [ ] Session ID table
+- [x] Session ID table
 - [ ] Restrict firewall on digital ocean (remove postgres)
 - [ ] Secret storage on digital ocean?
+- [ ] Admin select user login (deprecated public select user) and create user and users
+- [ ] Prevent multiple clicks doing the same thing
 
 ## DB Schema
 

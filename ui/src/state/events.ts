@@ -31,6 +31,7 @@ function fetchMyEvents(): Promise<any> {
         .catch(err => {
             myEventsState.value.error = "Unable to fetch my events"
             console.log("error fetching my events: " + err)
+            return Promise.reject(err)
         })
         .finally(() => myEventsState.value.loading = false)
 }
@@ -56,6 +57,7 @@ export function createEvent(eventName: string, state: Ref<CreateEventState>) {
         .catch(err => {
             console.log("unable to create event: " + err)
             state.value.error = "Unable to create event"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -74,6 +76,7 @@ export function getGiftRequests(eventId: string, state: Ref<GetGiftRequestsState
         .catch(err => {
             state.value.error = "Unable to fetch gift requests"
             console.log("error fetching gift requests: " + err)
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -95,6 +98,7 @@ export function persistGiftRequest(giftName: string, eventId: string, state: Ref
         .catch(err => {
             console.log("unable to persist gift request: " + err)
             state.value.error = "Unable to persist gift request"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -113,6 +117,7 @@ export function persistDeleteGiftRequest(eventId: string, giftId: string, state:
         .catch(err => {
             console.log("unable to delete gift request: " + err)
             state.value.error = "Unable to delete gift request"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -131,6 +136,7 @@ export function persistReleaseGift(eventId: string, giftId: string, state: Ref<R
         .catch(err => {
             console.log("unable to release gift request: " + err)
             state.value.error = "Unable to release gift request"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -149,6 +155,7 @@ export function persistClaimGift(eventId: string, giftId: string, byUserId: stri
         .catch(err => {
             console.log("unable to claim gift request: " + err)
             state.value.error = "Unable to claim gift request"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -170,6 +177,7 @@ export function persistUpdateEvent(eventId: string, name: string, memberEmails: 
         .catch(err => {
             console.log("unable to update event: " + err)
             state.value.error = "Unable to update event"
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }

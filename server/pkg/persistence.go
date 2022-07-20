@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -439,6 +438,81 @@ func (d Database) MapExternalIdToUser(externalId string, source AuthSource) (*Us
 	}
 
 	return d.ReadUser(userId)
+}
+
+type Session struct {
+	Id        string
+	UserId    string
+	CsrfToken string
+	Active    bool
+}
+
+func (d Database) ReadSession(id string) (*Session, error) {
+	row := d.Pool.QueryRow(context.Background(), "SELECT user_id, csrf_token, active FROM sessions WHERE id = $1", id)
+
+	var userId string
+	var csrfToken string
+	var active bool
+	err := row.Scan(&userId, &csrfToken, &active)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read session")
+	}
+
+	return &Session{
+		Id:        id,
+		UserId:    userId,
+		CsrfToken: csrfToken,
+		Active:    active,
+	}, nil
+}
+
+func (d Database) CreateSessionAndDeactivateOld(userId string) (*Session, error) {
+	txn, err := d.Pool.Begin(context.Background())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to begin txn")
+	}
+	defer txn.Rollback(context.Background())
+
+	session := Session{
+		Id:        uuid.New().String(),
+		UserId:    userId,
+		CsrfToken: uuid.New().String(),
+		Active:    true,
+	}
+	_, err = txn.Exec(context.Background(), "INSERT INTO sessions (id, user_id, csrf_token, active) VALUES ($1, $2, $3, $4)", session.Id, userId, session.CsrfToken, session.Active)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create session")
+	}
+
+	_, err = txn.Exec(context.Background(), "UPDATE sessions SET active = false WHERE user_id = $1 AND id != $2", userId, session.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to update session to deactivate previously active sessions")
+	}
+
+	err = txn.Commit(context.Background())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to commit txn for creating a session")
+	}
+	return &session, nil
+}
+
+func (d Database) ReadSessionForUser(userId string) (*Session, error) {
+	row := d.Pool.QueryRow(context.Background(), "SELECT id, csrf_token, active FROM sessions WHERE user_id = $1", userId)
+
+	var id string
+	var csrfToken string
+	var active bool
+	err := row.Scan(&id, &csrfToken, &active)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read session for userid")
+	}
+
+	return &Session{
+		Id:        id,
+		UserId:    userId,
+		CsrfToken: csrfToken,
+		Active:    active,
+	}, nil
 }
 
 func noRowsFoundError(err error) bool {

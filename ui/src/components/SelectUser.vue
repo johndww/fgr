@@ -3,16 +3,13 @@
     <h1 class="text-center my-3 pb-3">Who are you?</h1>
     <div v-if="createUserState.error">{{createUserState.error}}</div>
 
-    <div v-if="allUsersState.data.length > 0 && !currentUserState.data">
+    <div v-if="allUsersState.data.length > 0">
       <ul>
         <li v-for="user in allUsersState.data" :key="user.name"><button @click="selectUser(user.id)">{{ user.name }}</button></li>
       </ul>
       <form @submit="onCreateUser">
         <input name="name" v-model="createUserName"> <button type="submit">Join Registry</button>
       </form>
-    </div>
-    <div v-if="currentUserState.data">
-      Already logged in! <router-link :to="{name: 'selectevent'}">Events</router-link>
     </div>
     <LoadingOrError :loading="allUsersState.loading" :error="allUsersState.error"></LoadingOrError>
   </div>
@@ -32,8 +29,6 @@ export default {
     allUsersState.value.fetch()
 
     const createUserName = ref("")
-    const currentUserState = useCurrentUserState()
-    currentUserState.value.fetch()
 
     const router = useRouter()
 
@@ -58,7 +53,10 @@ export default {
         let loginPromise = login(createUserState.value.userId)
         loginPromise.then(() => {
           router.push({ name: 'selectevent'})
-        }).catch(err => console.log("unable to login user: " + err))
+        }).catch(err => {
+          console.log("unable to login user: " + err)
+          return Promise.reject(err)
+        })
       })
     }
 
@@ -66,14 +64,16 @@ export default {
       login(id).then(() => {
         router.push({ name: 'selectevent'})
       })
-      .catch(err => console.log("unable to login user: " + err))
+      .catch(err => {
+        console.log("unable to login user: " + err)
+        return Promise.reject(err)
+      })
     }
 
     return {
       allUsersState,
       createUserName,
       createUserState,
-      currentUserState,
       onCreateUser,
       selectUser
     }

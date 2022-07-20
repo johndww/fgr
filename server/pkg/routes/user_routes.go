@@ -26,42 +26,32 @@ func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := u.UserService.GoogleLogin(input.Token)
+	session, err := u.UserService.GoogleLogin(input.Token)
 	if err != nil {
 		logrus.WithError(err).Error("unable to validate google id token")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	u.setCookie(w, session.Id)
+
+	logrus.WithField("userId", session.UserId).Info("logged user in with google")
+}
+
+func (u UserGateway) AdminLoginHttp(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["id"]
+
+	session, err := u.UserService.AdminLogin(userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to admin login")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	u.setCookie(w, userId)
+	u.setCookie(w, session.Id)
 
-	logrus.WithField("userId", userId).Info("logged user in with google")
-}
-
-func (u UserGateway) LoginHttp(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userId := vars["id"]
-
-	user, err := u.UserService.GetUser(userId)
-	if err != nil {
-		logrus.WithError(err).Error("unable to read user")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if user == nil {
-		logrus.WithField("userId", userId).Warn("user not found for login")
-		w.WriteHeader(http.StatusNotFound)
-		_, err := w.Write([]byte("User not found: " + userId))
-		if err != nil {
-			logrus.WithError(err).Error("unable to write user not found error")
-			return
-		}
-	}
-
-	u.setCookie(w, userId)
-
-	logrus.WithField("userId", userId).Info("logged user in")
+	logrus.WithField("userId", userId).Info("logged admin user in")
 }
 
 func (u UserGateway) setCookie(w http.ResponseWriter, userId string) {
@@ -222,6 +212,33 @@ func (u UserGateway) EventUsersHttp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = WriteResponse(w, output)
+	if err != nil {
+		logrus.WithError(err).Error("unable to write response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+type CsrfResponse struct {
+	Token string `json:"token"`
+}
+
+func (u UserGateway) Csrf(w http.ResponseWriter, r *http.Request) {
+	userId, err := pkg.UserIdFromContext(r.Context())
+	if err != nil {
+		logrus.WithError(err).Error("unable to pull userid from context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	csrf, err := u.UserService.GetCsrf(userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to pull userid from context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = WriteResponse(w, CsrfResponse{Token: csrf})
 	if err != nil {
 		logrus.WithError(err).Error("unable to write response")
 		w.WriteHeader(http.StatusInternalServerError)

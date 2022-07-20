@@ -1,7 +1,7 @@
 import {User} from "../App.vue";
 import axios from "axios";
 import {Ref, ref} from "vue";
-import {SharedState, State} from "../state/store";
+import {fetchCSRFToken, SharedState, State} from "../state/store";
 
 export interface AllUsersState extends SharedState<User[]> {}
 
@@ -30,6 +30,7 @@ function fetchAllUsers(): Promise<any> {
         .catch(err => {
             allUsersState.value.error = "Unable to fetch users"
             console.log("error fetching users: " + err)
+            return Promise.reject(err)
         })
         .finally(() => allUsersState.value.loading = false)
 }
@@ -55,6 +56,7 @@ export function createUser(userName: string, createUserState: Ref<CreateUserStat
         .catch(err => {
             console.log("unable to create user: " + err)
             createUserState.value.error = "Unable to create user"
+            return Promise.reject(err)
         })
         .finally(() => createUserState.value.loading = false)
 }
@@ -64,10 +66,20 @@ export function login(userId: string): Promise<any> {
         withCredentials: true
     })
         .then(() => {
-            return fetchCurrentUser()
+            return fetchCSRFToken()
+                .then(() => {
+                    return fetchCurrentUser().catch((err) => {
+                        console.log("unable to fetch user after logging in: " + err.message)
+                        return Promise.reject(err)
+                    })
+                }).catch((err) => {
+                    console.log("unable to fetch CSRF token immediately after logging in. will try again: " + err.message)
+                    return Promise.resolve()
+                })
         })
         .catch(err => {
-            console.log("unable to login: " + err)
+            console.log("unable to login: " + err.message)
+            return Promise.reject(err)
         })
 }
 
@@ -78,10 +90,20 @@ export function loginGoogle(credential: string): Promise<any> {
         withCredentials: true
     })
         .then(() => {
-            return fetchCurrentUser()
+            return fetchCSRFToken()
+                .then(() => {
+                    return fetchCurrentUser().catch((err) => {
+                        console.log("unable to fetch user after logging in: " + err.message)
+                        return Promise.reject(err)
+                    })
+                }).catch((err) => {
+                    console.log("unable to fetch CSRF token immediately after logging in. will try again: " + err.message)
+                    return Promise.resolve()
+                })
         })
         .catch(err => {
             console.log("unable to login with google: " + err)
+            return Promise.reject(err)
         })
 }
 
@@ -90,10 +112,14 @@ export function useCurrentUserId() {
 }
 
 export function isLoggedIn(): boolean {
-    return currentUserId.value != ""
+    return !!currentUserId.value;
 }
 
-const currentUserId = ref("")
+export function haveCheckedIfLoggedIn(): boolean {
+    return currentUserId.value === null || currentUserId.value == ""
+}
+
+const currentUserId: Ref<string | undefined | null> = ref(undefined)
 
 export interface CurrentUserState extends SharedState<User | null> {}
 
@@ -123,8 +149,12 @@ function fetchCurrentUser(): Promise<any> {
             currentUserState.value.error = ""
         })
         .catch(err => {
-            console.log("unable to fetch current user: " + err)
+            // this API is used to check if the user is logged in or not. if we get a 403, it's not really an error, no need pollute the logs
+            if (err.response.status != 403) {
+                console.log("unable to fetch current user: " + err)
+            }
             currentUserState.value.error = "Unable to fetch current user"
+            return Promise.reject(err)
         })
         .finally(() => currentUserState.value.loading = false)
 }
@@ -143,6 +173,7 @@ export function getUsersForEvent(eventId: string, state: Ref<GetUsersForEventSta
         .catch(err => {
             state.value.error = "Unable to fetch users for event"
             console.log("error fetching users for event: " + err)
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
@@ -163,6 +194,7 @@ export function logoutUser(state: Ref<LogoutState>): Promise<any> {
         .catch(err => {
             state.value.error = "Unable to logout"
             console.log("unable to login: " + err)
+            return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)
 }
