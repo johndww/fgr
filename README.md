@@ -48,9 +48,8 @@ login to be able to see claimed gifts & to claim gifts
 - [ ] event owner controls
   - [ ] delete event (with confirmation)
   - [x] update event details (& membership)
-  - 
 ### TODO
-- [ ] Add versioning to endpoints
+- [x] Add versioning to endpoints
 - [ ] Support invited user getting claimed
 - [x] CSRF protection
 - [ ] Invited user email is not the one they authed with
