@@ -57,7 +57,7 @@ login to be able to see claimed gifts & to claim gifts
 - [x] Session ID table
 - [ ] Restrict firewall on digital ocean (remove postgres)
 - [ ] Secret storage on digital ocean?
-- [ ] Admin select user login (deprecated public select user) and create user and users
+- [x] Admin select user login (deprecated public select user) and create user and users
 - [ ] Prevent multiple clicks doing the same thing
 
 ## DB Schema

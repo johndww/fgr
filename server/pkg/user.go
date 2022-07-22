@@ -31,6 +31,7 @@ func (u UserService) CreateUser(name string) (string, error) {
 		Id:    uuid.New().String(),
 		Name:  name,
 		Email: name + "@Email.com",
+		Admin: false,
 	}
 
 	err := u.Database.WriteUser(user)
@@ -65,10 +66,6 @@ func (u UserService) AdminLogin(userId string) (*Session, error) {
 
 	if user == nil {
 		return nil, errors.New("could not find user to login to")
-	}
-
-	if !user.IsAdmin() {
-		return nil, errors.New("not an admin")
 	}
 
 	return u.Database.CreateSessionAndDeactivateOld(user.Id)
@@ -137,8 +134,5 @@ type User struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
-}
-
-func (u User) IsAdmin() bool {
-	return true
+	Admin bool   `json:"admin"`
 }

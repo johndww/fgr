@@ -4,8 +4,6 @@
   duplicating gifts to anyone or spoiling the gift surprise.</p>
 
   <p>To get started, login:</p>
-  <button type="button" @click="selectUser()" class="btn btn-primary btn-block mb-4">Select User</button>
-  <br />
   <button type="button" @click="toLogin()" class="btn btn-primary btn-block mb-4">Login</button>
 </div>
 </template>

@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strings"
 )
 
 const SessionCookieName = "sessionId"
@@ -15,12 +14,6 @@ type SessionMiddleware struct {
 
 func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//TODO users shouldn't be here, replace with real auth
-		if strings.HasPrefix(r.URL.Path, "/login") || r.URL.Path == "/login/google" || r.URL.Path == "/users" || r.URL.Path == "/users/create" {
-			next.ServeHTTP(w, r)
-			return
-		}
-
 		cookie, err := r.Cookie(SessionCookieName)
 		if err != nil {
 			if r.URL.Path == "/users/me" {
@@ -47,7 +40,7 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if r.URL.Path != "/csrf" {
+		if r.URL.Path != "/api/v1/csrf" {
 			csrfToken := r.Header.Get(csrfHeader)
 			if csrfToken == "" {
 				logrus.Warn("request with no CSRF token")

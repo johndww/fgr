@@ -22,7 +22,9 @@ function fetchAllUsers(): Promise<any> {
     console.log("fetching users")
     allUsersState.value.loading = true
 
-    return axios.get("http://localhost/users")
+    return axios.get("http://localhost/api/v1/users", {
+        withCredentials: true,
+    })
         .then(resp => {
             allUsersState.value.data = resp.data.users
             allUsersState.value.error = ""
@@ -44,7 +46,7 @@ export interface CreateUserState {
 export function createUser(userName: string, createUserState: Ref<CreateUserState>): Promise<any> {
     createUserState.value.loading = true
 
-    return axios.post("http://localhost/users/create", {
+    return axios.post("http://localhost/api/v1/users/create", {
         name: userName
     }, {
         withCredentials: true
@@ -62,7 +64,7 @@ export function createUser(userName: string, createUserState: Ref<CreateUserStat
 }
 
 export function login(userId: string): Promise<any> {
-    return axios.post('http://localhost/login/user/' + userId, {}, {
+    return axios.post('http://localhost/api/v1/login/user/' + userId, {}, {
         withCredentials: true
     })
         .then(() => {
@@ -84,7 +86,7 @@ export function login(userId: string): Promise<any> {
 }
 
 export function loginGoogle(credential: string): Promise<any> {
-    return axios.post('http://localhost/login/google', {
+    return axios.post('http://localhost/api/v1/login/google', {
         token: credential
     }, {
         withCredentials: true
@@ -140,7 +142,7 @@ function fetchCurrentUser(): Promise<any> {
     console.log("fetching current user")
     currentUserState.value.loading = true
 
-    return axios.get("http://localhost/users/me", {
+    return axios.get("http://localhost/api/v1/users/me", {
         withCredentials: true,
     })
         .then(resp => {
@@ -154,6 +156,7 @@ function fetchCurrentUser(): Promise<any> {
                 console.log("unable to fetch current user: " + err)
             }
             currentUserState.value.error = "Unable to fetch current user"
+            currentUserId.value = null // undefined -> null, shows that we have attempted evaluation
             return Promise.reject(err)
         })
         .finally(() => currentUserState.value.loading = false)
@@ -165,7 +168,7 @@ export function getUsersForEvent(eventId: string, state: Ref<GetUsersForEventSta
     console.log("fetching event users")
     state.value.loading = true
 
-    return axios.get("http://localhost/users/event/" + eventId, {withCredentials: true})
+    return axios.get("http://localhost/api/v1/users/event/" + eventId, {withCredentials: true})
         .then(resp => {
             state.value.data = resp.data.users
             state.value.error = ""
@@ -183,7 +186,7 @@ export interface LogoutState extends State<string> {}
 export function logoutUser(state: Ref<LogoutState>): Promise<any> {
     state.value.loading = true
 
-    return axios.post('http://localhost/logout', {}, {
+    return axios.post('http://localhost/api/v1/logout', {}, {
         withCredentials: true
     })
         .then(() => {

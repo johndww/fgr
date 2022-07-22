@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -34,7 +35,7 @@ type Database struct {
 }
 
 func (d Database) ReadUsers() ([]User, error) {
-	rows, err := d.Pool.Query(context.Background(), "select * from users")
+	rows, err := d.Pool.Query(context.Background(), "select id, name, email, admin from users")
 	if err != nil {
 		logrus.WithError(err).Error("Query failed")
 		return nil, err
@@ -45,13 +46,14 @@ func (d Database) ReadUsers() ([]User, error) {
 		var id string
 		var name string
 		var email string
+		var admin bool
 
-		err := rows.Scan(&id, &name, &email)
+		err := rows.Scan(&id, &name, &email, &admin)
 		if err != nil {
 			return nil, err
 		}
 
-		users = append(users, User{id, name, email})
+		users = append(users, User{id, name, email, admin})
 	}
 
 	return users, rows.Err()
@@ -60,7 +62,8 @@ func (d Database) ReadUsers() ([]User, error) {
 func (d Database) ReadUser(id string) (*User, error) {
 	var name string
 	var email string
-	err := d.Pool.QueryRow(context.Background(), "select name, email from users where id = $1", id).Scan(&name, &email)
+	var admin bool
+	err := d.Pool.QueryRow(context.Background(), "select name, email, admin from users where id = $1", id).Scan(&name, &email, &admin)
 	if err != nil {
 		if noRowsFoundError(err) {
 			return nil, nil
@@ -72,11 +75,12 @@ func (d Database) ReadUser(id string) (*User, error) {
 		Id:    id,
 		Name:  name,
 		Email: email,
+		Admin: admin,
 	}, nil
 }
 
 func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
-	rows, err := d.Pool.Query(context.Background(), "SELECT users.id, users.name, users.email FROM users INNER JOIN memberships ON users.id = memberships.user_id AND memberships.event_id = $1", eventId)
+	rows, err := d.Pool.Query(context.Background(), "SELECT users.id, users.name, users.email, users.admin FROM users INNER JOIN memberships ON users.id = memberships.user_id AND memberships.event_id = $1", eventId)
 	if err != nil {
 		logrus.WithError(err).Error("Query failed")
 		return nil, err
@@ -87,20 +91,21 @@ func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
 		var id string
 		var name string
 		var email string
+		var admin bool
 
-		err := rows.Scan(&id, &name, &email)
+		err := rows.Scan(&id, &name, &email, &admin)
 		if err != nil {
 			return nil, err
 		}
 
-		users = append(users, User{id, name, email})
+		users = append(users, User{id, name, email, admin})
 	}
 
 	return users, rows.Err()
 }
 
 func (d Database) WriteUser(user User) error {
-	_, err := d.Pool.Exec(context.Background(), "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", user.Id, user.Name, user.Email)
+	_, err := d.Pool.Exec(context.Background(), "INSERT INTO users (id, name, email, admin) VALUES ($1, $2, $3, $4)", user.Id, user.Name, user.Email, user.Admin)
 	return err
 }
 

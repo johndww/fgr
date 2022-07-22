@@ -34,7 +34,7 @@ export function setupCsrfInterceptor() {
 }
 
 export function fetchCSRFToken(): Promise<any> {
-    return axios.get("http://localhost/csrf", {
+    return axios.get("http://localhost/api/v1/csrf", {
         withCredentials: true
     }).then(resp => {
         csrfToken = resp.data.token

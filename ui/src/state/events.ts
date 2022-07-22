@@ -23,7 +23,7 @@ function fetchMyEvents(): Promise<any> {
     console.log("fetching my events")
     myEventsState.value.loading = true
 
-    return axios.get("http://localhost/events", {withCredentials: true})
+    return axios.get("http://localhost/api/v1/events", {withCredentials: true})
         .then(resp => {
             myEventsState.value.data = resp.data.events
             myEventsState.value.error = ""
@@ -45,7 +45,7 @@ export interface CreateEventState {
 export function createEvent(eventName: string, state: Ref<CreateEventState>) {
     state.value.loading = true
 
-    return axios.post("http://localhost/events/create", {
+    return axios.post("http://localhost/api/v1/events/create", {
         name: eventName
     }, {
         withCredentials: true
@@ -68,7 +68,7 @@ export function getGiftRequests(eventId: string, state: Ref<GetGiftRequestsState
     console.log("fetching gift requests for event")
     state.value.loading = true
 
-    return axios.get("http://localhost/events/" + eventId + "/gift-requests", {withCredentials: true})
+    return axios.get("http://localhost/api/v1/events/" + eventId + "/gift-requests", {withCredentials: true})
         .then(resp => {
             state.value.data = resp.data.gifts
             state.value.error = ""
@@ -86,7 +86,7 @@ export interface PersistGiftRequestState extends State<string>{}
 export function persistGiftRequest(giftName: string, eventId: string, state: Ref<PersistGiftRequestState>) {
     state.value.loading = true
 
-    return axios.post("http://localhost/events/" + eventId + "/gift-requests/create", {
+    return axios.post("http://localhost/api/v1/events/" + eventId + "/gift-requests/create", {
         name: giftName
     }, {
         withCredentials: true
@@ -108,7 +108,7 @@ export interface DeleteGiftRequestState extends State<string>{}
 export function persistDeleteGiftRequest(eventId: string, giftId: string, state: Ref<DeleteGiftRequestState>) {
     state.value.loading = true
 
-    return axios.delete("http://localhost/events/" + eventId + "/gift-requests/" + giftId + "/delete", {
+    return axios.delete("http://localhost/api/v1/events/" + eventId + "/gift-requests/" + giftId + "/delete", {
         withCredentials: true
     })
         .then(() => {
@@ -127,7 +127,7 @@ export interface ReleaseGiftRequestState extends State<string>{}
 export function persistReleaseGift(eventId: string, giftId: string, state: Ref<ReleaseGiftRequestState>) {
     state.value.loading = true
 
-    return axios.post("http://localhost/events/" + eventId + "/gift-requests/" + giftId + "/release", {}, {
+    return axios.post("http://localhost/api/v1/events/" + eventId + "/gift-requests/" + giftId + "/release", {}, {
         withCredentials: true
     })
         .then(() => {
@@ -146,7 +146,7 @@ export interface ClaimGiftRequestState extends State<string>{}
 export function persistClaimGift(eventId: string, giftId: string, byUserId: string, state: Ref<ClaimGiftRequestState>) {
     state.value.loading = true
 
-    return axios.post("http://localhost/events/" + eventId + "/gift-requests/" + giftId + "/claim", {}, {
+    return axios.post("http://localhost/api/v1/events/" + eventId + "/gift-requests/" + giftId + "/claim", {}, {
         withCredentials: true
     })
         .then(() => {
@@ -165,7 +165,7 @@ export interface UpdateEventState extends State<string>{}
 export function persistUpdateEvent(eventId: string, name: string, memberEmails: string[], state: Ref<UpdateEventState>): Promise<any> {
     state.value.loading = true
 
-    return axios.post("http://localhost/events/" + eventId + "/update", {
+    return axios.post("http://localhost/api/v1/events/" + eventId + "/update", {
         name: name,
         emails: memberEmails
     }, {

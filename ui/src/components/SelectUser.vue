@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-center my-3 pb-3">Who are you?</h1>
+    <h1 class="text-center my-3 pb-3">Admin: Login to another user</h1>
     <div v-if="createUserState.error">{{createUserState.error}}</div>
 
     <div v-if="allUsersState.data.length > 0">

@@ -7,9 +7,9 @@ import Login from "./components/Login.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import EditEvent from "./components/EditEvent.vue";
 import Home from "./components/Home.vue";
-import {haveCheckedIfLoggedIn, isLoggedIn, useCurrentUserId, useCurrentUserState} from "./state/users";
 import vue3GoogleLogin from 'vue3-google-login'
 import {setupCsrfInterceptor} from "./state/store";
+import {setupRouterSecurity} from "./router_security";
 
 const routes = [
     {
@@ -49,37 +49,7 @@ const router = createRouter({
     routes,
 })
 
-router.beforeEach(async (to, from, next) => {
-    if (!isLoggedIn() && !haveCheckedIfLoggedIn()) {
-        console.log("checking if the user already has a session")
-
-        const isLoggedIn = await useCurrentUserState().value.fetch().then(() => {
-            console.log("detected valid user session and is logged in")
-            return Promise.resolve(true)
-        }).catch(() => {
-            console.log("user does not have a valid session")
-            return Promise.resolve(false)
-        })
-
-        if (isLoggedIn) {
-            if (to.name === "home") {
-                console.log("user was attempting to go home, but is already logged in. redirecting to select event")
-                next({name: 'selectevent'})
-            } else {
-                next()
-            }
-            return
-        }
-    }
-
-    if (!isLoggedIn() && !(to.name == "login" || to.name === "selectuser" || to.name === "home")) {
-        console.log("not logged in or trying to login, redirecting back to home")
-        next({name: 'home'})
-    } else {
-        next()
-    }
-})
-
+setupRouterSecurity(router)
 setupCsrfInterceptor()
 
 const app = createApp(App)

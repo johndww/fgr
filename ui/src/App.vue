@@ -6,13 +6,14 @@
           <div class="card rounded-3">
             <div class="card-body p-4">
 
-              <div v-show="currentUserState().value.data">
+              <div v-show="currentUserState.data">
                 <nav class="navbar navbar-light bg-light">
                   <div class="container-fluid">
                     <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>
 
                     <div style="text-align: right">
-                      <a @click="logout" >{{ currentUserState().value.data != null && currentUserState().value.data.name }}</a>
+                      <a @click="logout" >{{ currentUserState.data != null && currentUserState.data.name }}</a><br />
+                      <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser">Admin</a>
                     </div>
                   </div>
                 </nav>
@@ -37,6 +38,7 @@ export interface User {
   id: string,
   name: string,
   email: string,
+  admin: boolean,
 }
 
 export interface Event {
@@ -57,9 +59,7 @@ export interface GiftRequest {
 export default defineComponent({
   name: 'App',
   setup() {
-    const currentUserState = function () {
-      return useCurrentUserState();
-    }
+    const currentUserState = useCurrentUserState()
 
     const router = useRouter()
 
@@ -71,9 +71,15 @@ export default defineComponent({
       })
     }
 
+    const selectUser = function () {
+      console.log("admin moving to selectuser")
+      router.push({name: "selectuser"})
+    }
+
     return {
       currentUserState,
-      logout
+      logout,
+      selectUser
     }
   }
 })
