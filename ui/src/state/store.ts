@@ -1,5 +1,9 @@
 import axios from "axios";
 
+export const backendBaseUrl = "http://localhost:8085"
+export const v1api = "/api/v1"
+export const backendV1Url = backendBaseUrl + v1api
+
 export interface SharedState<T> {
     data: T
     loading: boolean
@@ -34,7 +38,7 @@ export function setupCsrfInterceptor() {
 }
 
 export function fetchCSRFToken(): Promise<any> {
-    return axios.get("http://localhost/api/v1/csrf", {
+    return axios.get(backendV1Url + "/csrf", {
         withCredentials: true
     }).then(resp => {
         csrfToken = resp.data.token

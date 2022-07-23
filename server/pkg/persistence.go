@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -19,9 +18,9 @@ const (
 	GoogleAuthSource AuthSource = "google"
 )
 
-func NewDatabase() (*Database, error) {
+func NewDatabase(config Config) (*Database, error) {
 	//TODO remove this secret
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DB_URL"))
+	pool, err := pgxpool.Connect(context.Background(), config.DbConnectString)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to connect to db")
 	}

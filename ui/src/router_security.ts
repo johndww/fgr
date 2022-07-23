@@ -51,25 +51,25 @@ function notLoggedInRedirect(to: RouteLocationNormalized, from: RouteLocationNor
     return null
 }
 
-function initLoginStateAndRedirect(to: RouteLocationNormalized, from: RouteLocationNormalized): Promise<string | null | undefined> {
+function initLoginStateAndRedirect(to: RouteLocationNormalized, from: RouteLocationNormalized): Promise<string | null> {
     if (!isLoggedIn() && !haveCheckedIfLoggedIn()) {
         console.log("checking if the user already has a session")
 
         return useCurrentUserState().value.fetch()
             .then(() => {
                 console.log("detected valid user session and is logged in")
-                return Promise.resolve(true)
+                return true
             }).catch(() => {
                 console.log("user does not have a valid session")
-                return Promise.resolve(false)
-            }).then(isLoggedIn => {
+                return false
+            }).then((isLoggedIn) => {
                 if (isLoggedIn) {
                     if (to.name === "home") {
                         console.log("user was attempting to go home, but is already logged in")
                         return defaultLoggedInLocation
                     }
-                    return null
                 }
+                return null
             })
     }
     return Promise.resolve(null)

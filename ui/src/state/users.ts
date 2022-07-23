@@ -1,7 +1,7 @@
 import {User} from "../App.vue";
 import axios from "axios";
 import {Ref, ref} from "vue";
-import {fetchCSRFToken, SharedState, State} from "../state/store";
+import {backendV1Url, fetchCSRFToken, SharedState, State} from "../state/store";
 
 export interface AllUsersState extends SharedState<User[]> {}
 
@@ -22,7 +22,7 @@ function fetchAllUsers(): Promise<any> {
     console.log("fetching users")
     allUsersState.value.loading = true
 
-    return axios.get("http://localhost/api/v1/users", {
+    return axios.get(backendV1Url + "/users", {
         withCredentials: true,
     })
         .then(resp => {
@@ -46,7 +46,7 @@ export interface CreateUserState {
 export function createUser(userName: string, createUserState: Ref<CreateUserState>): Promise<any> {
     createUserState.value.loading = true
 
-    return axios.post("http://localhost/api/v1/users/create", {
+    return axios.post(backendV1Url + "/users/create", {
         name: userName
     }, {
         withCredentials: true
@@ -64,7 +64,7 @@ export function createUser(userName: string, createUserState: Ref<CreateUserStat
 }
 
 export function login(userId: string): Promise<any> {
-    return axios.post('http://localhost/api/v1/login/user/' + userId, {}, {
+    return axios.post(backendV1Url + '/login/user/' + userId, {}, {
         withCredentials: true
     })
         .then(() => {
@@ -86,7 +86,7 @@ export function login(userId: string): Promise<any> {
 }
 
 export function loginGoogle(credential: string): Promise<any> {
-    return axios.post('http://localhost/api/v1/login/google', {
+    return axios.post(backendV1Url + '/login/google', {
         token: credential
     }, {
         withCredentials: true
@@ -142,7 +142,7 @@ function fetchCurrentUser(): Promise<any> {
     console.log("fetching current user")
     currentUserState.value.loading = true
 
-    return axios.get("http://localhost/api/v1/users/me", {
+    return axios.get(backendV1Url + "/users/me", {
         withCredentials: true,
     })
         .then(resp => {
@@ -168,7 +168,7 @@ export function getUsersForEvent(eventId: string, state: Ref<GetUsersForEventSta
     console.log("fetching event users")
     state.value.loading = true
 
-    return axios.get("http://localhost/api/v1/users/event/" + eventId, {withCredentials: true})
+    return axios.get(backendV1Url + "/users/event/" + eventId, {withCredentials: true})
         .then(resp => {
             state.value.data = resp.data.users
             state.value.error = ""
@@ -186,7 +186,7 @@ export interface LogoutState extends State<string> {}
 export function logoutUser(state: Ref<LogoutState>): Promise<any> {
     state.value.loading = true
 
-    return axios.post('http://localhost/api/v1/logout', {}, {
+    return axios.post(backendV1Url + '/logout', {}, {
         withCredentials: true
     })
         .then(() => {

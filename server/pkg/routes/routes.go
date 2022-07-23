@@ -7,8 +7,8 @@ import (
 	"server/pkg"
 )
 
-func Define() *mux.Router {
-	db, err := pkg.NewDatabase()
+func Define(config pkg.Config) *mux.Router {
+	db, err := pkg.NewDatabase(config)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not create database")
 	}

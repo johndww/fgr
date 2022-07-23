@@ -10,14 +10,16 @@ basic gift registry
 - DB: Postgres run on Droplet
 - Deployment: Digital Ocean Droplet
 
-### Starting UI
+### Setup UI
+- cd ui
 - npm install
-- npm install -g @vue/cli
 - npm run dev
 
-### Backend
-
-login to be able to see claimed gifts & to claim gifts
+### Setup Backend
+- create a .env.local file and fill out the fields based off of .env
+- cd server
+- go mod vendor
+- go run main.go
 
 ## Pages
 
@@ -50,35 +52,11 @@ login to be able to see claimed gifts & to claim gifts
   - [x] update event details (& membership)
 ### TODO
 - [x] Add versioning to endpoints
-- [ ] Support invited user getting claimed
 - [x] CSRF protection
-- [ ] Invited user email is not the one they authed with
 - [x] Session ID table
-- [ ] Restrict firewall on digital ocean (remove postgres)
-- [ ] Secret storage on digital ocean?
+- [x] Secret storage on digital ocean (.env file)
 - [x] Admin select user login (deprecated public select user) and create user and users
+- [ ] Restrict firewall on digital ocean (remove postgres)
 - [ ] Prevent multiple clicks doing the same thing
-
-## DB Schema
-
-* event 
-    - id
-    - ownerUserId
-    - name
-
-* users
-    - id
-    - name
-    - email
-
-* membership
-    - id
-    - eventId
-    - userId
-
-* gift_requests
-    - id
-    - userId
-    - eventId
-    - name
-    - assignedUserId
+- [ ] Support invited user getting claimed
+- [ ] Invited user email is not the one they authed with

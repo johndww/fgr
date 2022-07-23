@@ -1,16 +1,22 @@
 package main
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
+	"server/pkg"
 	"server/pkg/routes"
 )
 
-func main() {
-	log.Println("FGR server startup")
+const listenURL = "127.0.0.1:8085"
 
-	router := routes.Define()
+func main() {
+	logrus.Info("FGR server startup")
+
+	config := pkg.ReadConfig()
+
+	router := routes.Define(config)
 
 	//TODO change to localhost before prod
-	log.Fatal(http.ListenAndServe("127.0.0.1:80", router))
+	logrus.Infof("Startup complete listening on: " + listenURL)
+	logrus.Fatal(http.ListenAndServe(listenURL, router))
 }
