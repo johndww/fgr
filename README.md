@@ -17,6 +17,7 @@ basic gift registry
 
 ### Setup Backend
 - create a .env.local file and fill out the fields based off of .env
+- install https://magefile.org/ (brew install mage)
 - cd server
 - go mod vendor
 - go run main.go
@@ -56,6 +57,8 @@ basic gift registry
 - [x] Session ID table
 - [x] Secret storage on digital ocean (.env file)
 - [x] Admin select user login (deprecated public select user) and create user and users
+- [ ] HTTPS and secure cookie
+- [ ] Collate loading and errors on pages that have multiple async sources
 - [ ] Restrict firewall on digital ocean (remove postgres)
 - [ ] Prevent multiple clicks doing the same thing
 - [ ] Support invited user getting claimed

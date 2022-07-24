@@ -14,8 +14,15 @@ func ReadConfig() Config {
 		behavior = "dev"
 		err := godotenv.Load(".env.local")
 		if err != nil {
-			logrus.WithError(err).Fatal()
+			logrus.WithError(err).Fatal("cannot load behavior dev config")
 		}
+		logrus.Info("loaded dev config")
+	} else {
+		err := godotenv.Load(".env." + behavior)
+		if err != nil {
+			logrus.WithError(err).Fatal("cannot load env props for behavior: " + behavior)
+		}
+		logrus.Infof("loaded %s config", behavior)
 	}
 
 	err := godotenv.Load()
@@ -24,7 +31,9 @@ func ReadConfig() Config {
 	}
 
 	return Config{
-		DbConnectString: mustEnv("DB_CONNECT_STRING"),
+		DbConnectString:    mustEnv("DB_CONNECT_STRING"),
+		ListenURL:          mustEnv("LISTEN_URL"),
+		GoogleAuthClientId: mustEnv("GOOGLE_AUTH_CLIENT_ID"),
 	}
 }
 
@@ -37,5 +46,7 @@ func mustEnv(key string) string {
 }
 
 type Config struct {
-	DbConnectString string
+	DbConnectString    string
+	ListenURL          string
+	GoogleAuthClientId string
 }

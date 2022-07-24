@@ -18,7 +18,7 @@
 <script lang="ts">
 
 import {Ref, ref} from "vue";
-import {createUser, CreateUserState, login, useAllUsers, useCurrentUserState,} from "../state/users";
+import {createUser, CreateUserState, login, useAllUsers,} from "../state/users";
 import {useRouter} from "vue-router";
 import LoadingOrError from "./LoadingOrError.vue";
 
@@ -41,7 +41,7 @@ export default {
     const onCreateUser = function(e: any) {
       e.preventDefault()
 
-      if (!createUserName) {
+      if (!createUserName.value) {
         alert("Please enter a username")
         return
       }

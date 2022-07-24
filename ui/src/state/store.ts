@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const backendBaseUrl = "http://localhost:8085"
+export const backendBaseUrl = "https://simplegift.app:8085"
 export const v1api = "/api/v1"
 export const backendV1Url = backendBaseUrl + v1api
 

@@ -19,7 +19,7 @@ func Define(config pkg.Config) *mux.Router {
 	baseRouter.Use(pkg.CORSOriginMiddleware{}.Middleware)
 	baseRouter.Use(pkg.RequestMiddleware{}.Middleware)
 
-	userGw := UserGateway{UserService: &pkg.UserService{Database: db}}
+	userGw := UserGateway{UserService: &pkg.UserService{Database: db, Config: config}}
 
 	apiRouter := baseRouter.PathPrefix("/api").Subrouter()
 	v1UnauthenticatedRouterRouter := apiRouter.PathPrefix("/v1").Subrouter()

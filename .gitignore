@@ -13,4 +13,5 @@
 
 # Dependency directories (remove the comment below to include it)
 server/vendor
-server/.env.local
+server/.env.*
+server/build

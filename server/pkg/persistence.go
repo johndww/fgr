@@ -19,7 +19,6 @@ const (
 )
 
 func NewDatabase(config Config) (*Database, error) {
-	//TODO remove this secret
 	pool, err := pgxpool.Connect(context.Background(), config.DbConnectString)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to connect to db")

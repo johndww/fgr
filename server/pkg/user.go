@@ -24,6 +24,7 @@ func UserIdFromContext(ctx context.Context) (string, error) {
 
 type UserService struct {
 	Database *Database
+	Config   Config
 }
 
 func (u UserService) CreateUser(name string) (string, error) {
@@ -71,11 +72,8 @@ func (u UserService) AdminLogin(userId string) (*Session, error) {
 	return u.Database.CreateSessionAndDeactivateOld(user.Id)
 }
 
-//TODO pull out to config. not really a secret, but still shouldn't be committed
-const aud = "186100627326-iqnh1vj4bbbse1i1qh24p1br61c9hgjh.apps.googleusercontent.com"
-
 func (u UserService) GoogleLogin(token string) (*Session, error) {
-	payload, err := idtoken.Validate(context.Background(), token, aud)
+	payload, err := idtoken.Validate(context.Background(), token, u.Config.GoogleAuthClientId)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to validate google jwt")
 	}
