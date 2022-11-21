@@ -13,7 +13,7 @@ basic gift registry
 ### Setup UI
 - cd ui
 - npm install
-- npm run dev
+- vite (or vite build for prod)
 
 ### Setup Backend
 - create a .env.local file and fill out the fields based off of .env

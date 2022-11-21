@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vite build",
     "lint": "vue-cli-service lint",
     "dev": "vite"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.5",
     "@vitejs/plugin-vue": "^2.1.0",
     "axios": "^0.27.2",
+    "bootstrap": "^5.2.0",
     "core-js": "^3.6.5",
     "vite": "^2.7.13",
     "vue": "^3.0.0",

@@ -10,6 +10,8 @@ import Home from "./components/Home.vue";
 import vue3GoogleLogin from 'vue3-google-login'
 import {setupCsrfInterceptor} from "./state/store";
 import {setupRouterSecurity} from "./router_security";
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap"
 
 const routes = [
     {

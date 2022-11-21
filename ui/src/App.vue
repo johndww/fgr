@@ -58,6 +58,9 @@ export interface GiftRequest {
 
 export default defineComponent({
   name: 'App',
+  meta: {
+    title: "Simple Gift App",
+  },
   setup() {
     const currentUserState = useCurrentUserState()
 

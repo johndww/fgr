@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div v-if="error">
-      {{ error }}
+    <div v-if="errorc">
+      {{ errorc }}
     </div>
-    <div v-if="loading">
+    <div v-if="loadingc">
       Loading...
     </div>
   </div>
@@ -15,11 +15,11 @@ import {computed} from "vue";
 export default {
   props: ['error', 'loading'],
   setup(props: any) {
-    const error = computed(() => props.error)
-    const loading = computed(() => props.loading)
+    const errorc = computed(() => props.error)
+    const loadingc = computed(() => props.loading)
     return {
-      error,
-      loading
+      errorc,
+      loadingc
     }
   }
 }

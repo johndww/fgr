@@ -31,6 +31,7 @@ func ReadConfig() Config {
 	}
 
 	return Config{
+		Behavior:           behavior,
 		DbConnectString:    mustEnv("DB_CONNECT_STRING"),
 		ListenURL:          mustEnv("LISTEN_URL"),
 		GoogleAuthClientId: mustEnv("GOOGLE_AUTH_CLIENT_ID"),
@@ -46,6 +47,7 @@ func mustEnv(key string) string {
 }
 
 type Config struct {
+	Behavior           string
 	DbConnectString    string
 	ListenURL          string
 	GoogleAuthClientId string

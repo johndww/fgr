@@ -51,11 +51,6 @@ func deployServer() error {
 		return errors.Wrap(err, "unable to upload server artifacts")
 	}
 
-	err = sh.Run("sftp", "fgr@164.92.73.41:/home/fgr", "<<<", "$'put -r build/'")
-	if err != nil {
-		return errors.Wrap(err, "unable to start server")
-	}
-
 	err = sh.Run("ssh", "-A", "-t", "fgr@164.92.73.41", "\"sudo systemctl start fgr\"")
 	if err != nil {
 		return errors.Wrap(err, "unable to start backend service")
@@ -72,7 +67,13 @@ func buildUi() error {
 }
 
 func buildServer() error {
+	//GOOS=linux GOARCH=amd64 CGO_ENABLED=0
 	if err := sh.Run("go", "build", "-o", "build/fgr"); err != nil {
+		return err
+	}
+
+	err := sh.Run("cp", ".env", "build")
+	if err != nil {
 		return err
 	}
 
