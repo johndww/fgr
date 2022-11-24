@@ -29,7 +29,7 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 
 		session, err := s.Database.ReadSession(sessionId)
 		if err != nil {
-			logrus.WithError(err).Error("unable to read session")
+			logrus.WithError(err).WithField("sessionId", sessionId).Error("unable to read session")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}

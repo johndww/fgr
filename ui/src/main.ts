@@ -6,6 +6,7 @@ import SelectUser from "./components/SelectUser.vue";
 import Login from "./components/Login.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import EditEvent from "./components/EditEvent.vue";
+import DevLogin from "./components/DevLogin.vue";
 import Home from "./components/Home.vue";
 import vue3GoogleLogin from 'vue3-google-login'
 import {setupCsrfInterceptor} from "./state/store";
@@ -43,6 +44,11 @@ const routes = [
         name: 'selectuser',
         path: '/selectuser',
         component: SelectUser
+    },
+    {
+        name: 'devlogin',
+        path: '/devlogin',
+        component: DevLogin
     },
 ]
 

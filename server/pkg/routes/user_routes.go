@@ -16,6 +16,10 @@ type googleToken struct {
 	Token string `json:"token"`
 }
 
+func (u UserGateway) DevAdminLogin(w http.ResponseWriter, r *http.Request) {
+	u.AdminLoginHttp(w, r)
+}
+
 func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 	input := googleToken{}
 	err := ReadBody(r.Body, &input)
@@ -55,14 +59,12 @@ func (u UserGateway) AdminLoginHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u UserGateway) setCookie(w http.ResponseWriter, userId string) {
-	expiration := time.Now().Add(365 * 24 * time.Hour)
-
 	sessionIdCookie := http.Cookie{
-		Name:    pkg.SessionCookieName,
-		Value:   userId,
-		Path:    "/",
-		Expires: expiration,
-		Secure:  false, //TODO should be true when we use https
+		Name:   pkg.SessionCookieName,
+		Value:  userId,
+		Path:   "/",
+		MaxAge: 30 * 24 * 60 * 60, // one month
+		Secure: false,             //TODO should be true when we use https
 	}
 	http.SetCookie(w, &sessionIdCookie)
 }

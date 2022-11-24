@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const backendBaseUrl = "https://simplegift.app"
+export const backendBaseUrl = import.meta.env.VITE_BACKEND_URL
 export const v1api = "/api/v1"
 export const backendV1Url = backendBaseUrl + v1api
 

@@ -4,8 +4,10 @@ import {RouteLocationNormalized, Router} from "vue-router";
 const defaultLoggedInLocation = 'selectevent';
 const defaultNotLoggedInLocation = 'home';
 
+const isDev = import.meta.env.DEV
+
 function adminRedirect(to: RouteLocationNormalized, from: RouteLocationNormalized): string | null {
-    if (to.name == "selectuser" && !useCurrentUserState().value.data?.admin) {
+    if ((to.name == "selectuser" && !useCurrentUserState().value.data?.admin) || (to.name === "devlogin" && !isDev)) {
         console.log("user is not an admin, invalid page location")
         return defaultLoggedInLocation
     }
@@ -44,7 +46,7 @@ export function setupRouterSecurity(router: Router) {
 }
 
 function notLoggedInRedirect(to: RouteLocationNormalized, from: RouteLocationNormalized): string | null {
-    if (!isLoggedIn() && !(to.name == "login" || to.name === "selectuser" || to.name === "home")) {
+    if (!isLoggedIn() && !(to.name == "login" || to.name === "selectuser" || to.name === "home" || to.name === "devlogin")) {
         console.log("not logged in or trying to login")
         return defaultNotLoggedInLocation
     }

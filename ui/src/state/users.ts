@@ -43,6 +43,19 @@ export interface CreateUserState {
     loading: boolean
 }
 
+export function devLogin(userId: string): Promise<any> {
+    return axios.get(backendV1Url + "/devadmin/login/" + userId, {
+        withCredentials: true,
+    })
+        .then(() => {
+            console.log("dev login successful")
+        })
+        .catch(err => {
+            console.log("unable to dev login user: " + err)
+            return Promise.reject(err)
+        })
+}
+
 export function createUser(userName: string, createUserState: Ref<CreateUserState>): Promise<any> {
     createUserState.value.loading = true
 
