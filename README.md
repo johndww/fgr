@@ -57,9 +57,9 @@ basic gift registry
 - [x] Session ID table
 - [x] Secret storage on digital ocean (.env file)
 - [x] Admin select user login (deprecated public select user) and create user and users
-- [ ] HTTPS and secure cookie
+- [x] HTTPS and secure cookie
 - [ ] Collate loading and errors on pages that have multiple async sources
-- [ ] Restrict firewall on digital ocean (remove postgres)
+- [x] Restrict firewall on digital ocean (remove postgres)
 - [ ] Prevent multiple clicks doing the same thing
 - [ ] Support invited user getting claimed
 - [ ] Invited user email is not the one they authed with

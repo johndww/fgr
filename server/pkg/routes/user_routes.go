@@ -10,6 +10,7 @@ import (
 
 type UserGateway struct {
 	UserService *pkg.UserService
+	Config      pkg.Config
 }
 
 type googleToken struct {
@@ -64,7 +65,7 @@ func (u UserGateway) setCookie(w http.ResponseWriter, userId string) {
 		Value:  userId,
 		Path:   "/",
 		MaxAge: 30 * 24 * 60 * 60, // one month
-		Secure: false,             //TODO should be true when we use https
+		Secure: u.Config.Behavior == "prod",
 	}
 	http.SetCookie(w, &sessionIdCookie)
 }
@@ -83,7 +84,7 @@ func (u UserGateway) LogoutHttp(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: time.Now(),
 		MaxAge:  0,
-		Secure:  false, //TODO should be true when we use https
+		Secure:  u.Config.Behavior == "prod",
 	}
 	http.SetCookie(w, &sessionIdCookie)
 
