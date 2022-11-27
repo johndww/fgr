@@ -1,7 +1,7 @@
 import {User} from "../App.vue";
 import axios from "axios";
 import {Ref, ref} from "vue";
-import {backendV1Url, fetchCSRFToken, SharedState, State} from "../state/store";
+import {backendBaseUrl, backendV1Url, fetchCSRFToken, SharedState, State} from "../state/store";
 
 export interface AllUsersState extends SharedState<User[]> {}
 
@@ -99,6 +99,8 @@ export function login(userId: string): Promise<any> {
 }
 
 export function loginGoogle(credential: string): Promise<any> {
+    console.log("backendUrl: " + backendV1Url)
+    console.log("backend base url: " + backendBaseUrl)
     return axios.post(backendV1Url + '/login/google', {
         token: credential
     }, {

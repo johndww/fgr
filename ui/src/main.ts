@@ -3,7 +3,6 @@ import SelectEvent from './components/SelectEvent.vue'
 import {createRouter, createWebHistory} from 'vue-router';
 import {createApp} from 'vue'
 import SelectUser from "./components/SelectUser.vue";
-import Login from "./components/Login.vue";
 import ViewEvent from "./components/ViewEvent.vue";
 import EditEvent from "./components/EditEvent.vue";
 import DevLogin from "./components/DevLogin.vue";
@@ -11,8 +10,7 @@ import Home from "./components/Home.vue";
 import vue3GoogleLogin from 'vue3-google-login'
 import {setupCsrfInterceptor} from "./state/store";
 import {setupRouterSecurity} from "./router_security";
-import "bootstrap/dist/css/bootstrap.min.css"
-import "bootstrap"
+import './assets/fonts/fonts.css'
 
 const routes = [
     {
@@ -34,11 +32,6 @@ const routes = [
         name: 'editevent',
         path: '/event/:id/edit',
         component: EditEvent
-    },
-    {
-        name: 'login',
-        path: '/login',
-        component: Login
     },
     {
         name: 'selectuser',
