@@ -15,7 +15,7 @@ func Define(config pkg.Config) *mux.Router {
 
 	baseRouter := mux.NewRouter()
 
-	baseRouter.Use(mux.CORSMethodMiddleware(baseRouter))
+	//baseRouter.Use(mux.CORSMethodMiddleware(baseRouter))
 	baseRouter.Use(pkg.CORSOriginMiddleware{Config: config}.Middleware)
 	baseRouter.Use(pkg.RequestMiddleware{}.Middleware)
 

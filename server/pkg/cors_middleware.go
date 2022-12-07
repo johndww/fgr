@@ -1,6 +1,8 @@
 package pkg
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type CORSOriginMiddleware struct {
 	Config Config
@@ -11,6 +13,7 @@ func (s CORSOriginMiddleware) Middleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", s.Config.UiUrl)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
+		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD")
 		if r.Method == http.MethodOptions {
 			return
 		}

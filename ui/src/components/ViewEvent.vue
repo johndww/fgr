@@ -1,56 +1,72 @@
 <template>
-  <LoadingOrError :loading="this.getEventUsersState.loading" :error="this.getEventUsersState.error"></LoadingOrError>
-  <div v-if="this.event">
-    <h1 class="text-center my-3 pb-3">{{ this.event.name }} <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}" v-if="this.event.ownerUserId === currentUserId">(edit)</router-link></h1>
-    <div class="tabbable tabs-left">
-      <ul class="nav nav-tabs">
-        <li v-for="user in getEventUsersState.data" :key="user.id">
-          <button
-              :class="user.id === this.viewResultsUserId ? (this.currentUserId === user.id ? 'btn btn-warning' : 'btn btn-primary') : 'btn btn-secondary'"
-              @click="this.viewResultsUserId = user.id">{{ user.name }}
-          </button>
-        </li>
-      </ul>
+  <div class="view-event-contents">
+    <div class="event-header">
+      <div class="view-event-title">
+        <h3 class="event-header-title-back">&lt All Events</h3>
+        <h1 class="event-header-title">Wrights 2022 Christmas</h1>
+      </div>
+      <div>
+        <img src="../assets/present_icon.svg" alt="SimpleGiftApp" width="124" height="115">
+      </div>
     </div>
 
-    <template v-if="this.viewResultsUser && currentUserId !== this.viewResultsUserId">
-      <div class="tab-content">
-        <table class="table mb-4">
-          <tbody>
-          <tr v-for="gift in unassignedGifts" :key="gift.name">
-            <td>{{ gift.name }}</td>
-            <td>
-              <button
-                  @click="assignGift(gift.id, currentUserId)"
-                  class="btn btn-primary">
-                Claim Gift
-              </button>
-            </td>
-          </tr>
+    <div>
+      <LoadingOrError :loading="this.getEventUsersState.loading"
+                      :error="this.getEventUsersState.error"></LoadingOrError>
+    </div>
 
-          <tr v-for="gift in assignedGifts" :key="gift.name">
-            <td>{{ gift.name }}</td>
-            <template v-if="gift.isAssignedToMe">
-              <td>
-                <button class="btn btn-warning"
-                        @click="releaseGift(gift.id)">
-                  Release Gift
-                </button>
-              </td>
-            </template>
-          </tr>
-          </tbody>
-        </table>
+    <div class="event-members">
+      <div v-for="(user, index) in getEventUsersState.data" :key="user.id">
 
+        <!-- selected user-->
+        <div v-if="user.id === this.viewResultsUserId" class="member-selected-container">
+          <div class="member-selected">
+            <img src="../assets/user_icon_empty.svg" alt="User" width="28" height="29" class="member-icon">
+            <span class="member-name-selected">{{ user.name }}</span>
+          </div>
+          <div class="user-selected-arrow"></div>
+        </div>
+
+
+        <!-- non-selected user-->
+        <div v-if="user.id !== this.viewResultsUserId" class="member" @click="this.viewResultsUserId = user.id">
+          <img :src="userIcon(index)" alt="User" width="28" height="29" class="member-icon">
+          <span class="member-name">{{ user.name }}</span>
+        </div>
       </div>
-    </template>
+    </div>
 
     <SelfGiftResults @add-gift="(giftToAdd) => addGift(giftToAdd)"
                      @delete-gift="(giftId) => deleteGift(giftId)"
                      :eventId="this.event.id" :giftRequestState="giftRequestState"
                      v-if="this.viewResultsUser && currentUserId === this.viewResultsUserId"/>
 
+    <div class="items" v-if="this.viewResultsUser && currentUserId !== this.viewResultsUserId">
+
+      <div class="item-claim" v-for="gift in unassignedGifts" :key="gift.name">
+        <div class="item-name">{{ gift.name }}</div>
+        <button class="claim-gift-button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
+      </div>
+
+      <div class="item-release" v-for="gift in assignedGifts" :key="gift.name">
+        <div class="item-name">{{ gift.name }}</div>
+        <template v-if="gift.isAssignedToMe">
+          <button class="release-gift-button" @click="releaseGift(gift.id)">Release Gift</button>
+        </template>
+      </div>
+
+    </div>
+
+    <div class="delete-edit-event-footer">
+      <div class="delete-event">
+        <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
+        <button class="delete-event-button">Delete Event</button>
+      </div>
+      <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}" v-if="this.event.ownerUserId === currentUserId"><button class="edit-event-button">Edit Event</button></router-link>
+    </div>
+
   </div>
+
 </template>
 
 <script lang="ts">
@@ -130,6 +146,19 @@ export default {
       persistReleaseGift(eventId, giftId, releaseGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
 
+    const userIcon = function(index: number) {
+      //TODO why is src needed..
+      const icons = [
+          "../src/assets/user_icon_blue.svg",
+          "../src/assets/user_icon_pink.svg",
+          "../src/assets/user_icon_purple.svg",
+          "../src/assets/user_icon_yellow.svg",
+      ]
+
+      const iconIdx = index % icons.length
+      return icons[iconIdx]
+    }
+
     return {
       viewResultsUserId,
       event,
@@ -142,7 +171,8 @@ export default {
       viewResultsUser,
       unassignedGifts,
       assignedGifts,
-      giftRequestState
+      giftRequestState,
+      userIcon
     }
   },
 }
@@ -152,8 +182,204 @@ export default {
 
 <style scoped>
 
-.edit {
-  color: #42b983;
-  font-size: 12px;
+.view-event-contents {
+  padding-bottom: 62px;
 }
+
+.view-event-title {
+  margin-left: 91px;
+  padding-top: 26px;
+}
+
+.event-header-title-back {
+  font: normal normal bold 14px/17px Proxima Nova;
+  letter-spacing: 0.7px;
+  color: #89BF60;
+  text-transform: uppercase;
+  display: block;
+  margin: 0px;
+  text-align: left;
+}
+
+.event-header-title {
+  font: normal normal 600 42px/52px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+  display: block;
+  margin: 0px;
+  text-align: left;
+}
+
+.event-members {
+  display: flex;
+  column-gap: 9px;
+  width: 100%;
+  margin-top: 34px;
+  margin-left: 91px;
+}
+
+.member {
+  height: 48px;
+  padding-left: 11px;
+  min-width: 152px;
+  padding-right: 11px;
+  border: 1px solid #E9E9E9;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.member-selected-container {
+  position: relative
+}
+
+.member-selected {
+  height: 48px;
+  padding-left: 11px;
+  padding-right: 11px;
+  min-width: 152px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  background: #89ACF1 0% 0% no-repeat padding-box;
+}
+
+.member-icon {
+  margin-right: 11.5px;
+  text-align: left;
+}
+
+.member-name {
+  text-align: left;
+  font: normal normal 600 19px/26px Proxima Nova;
+  letter-spacing: 0px;
+  color: #2F3237;
+}
+
+.member-name-selected {
+  text-align: left;
+  font: normal normal 600 19px/26px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+}
+
+.user-selected-arrow {
+  position: absolute;
+  top: 37px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 13px;
+  height: 13px;
+  transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+  background: #89ACF1 0% 0% no-repeat padding-box;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  margin: 20px 91px 30px;
+}
+
+.item-claim {
+  height: 79px;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  border: 1px solid #70707040;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.item-release {
+  height: 79px;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  border: 1px solid #89BF60;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.item-name {
+  font: normal normal bold 20px/24px Proxima Nova;
+  letter-spacing: 0px;
+  color: #2F3237;
+}
+
+.claim-gift-button {
+  background: #89BF60 0% 0% no-repeat padding-box;
+  border-radius: 6px;
+  width: 177px;
+  height: 46px;
+  text-align: center;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+}
+
+.release-gift-button {
+  width: 177px;
+  height: 46px;
+  background:none;
+  border: none;
+  cursor: pointer;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #89BF60;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.delete-edit-event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 91px 0px;
+}
+
+.delete-event-button {
+  border: none;
+  background: none;
+  width: 120px;
+  height: 42px;
+  font: normal normal bold 14px/17px Proxima Nova;
+  letter-spacing: 0.7px;
+  text-align: left;
+  color: #89BF60;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.trash-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.edit-event-button {
+  width: 177px;
+  height: 42px;
+  border: none;
+  background: #89BF60 0% 0% no-repeat padding-box;
+  border-radius: 6px;
+  text-align: center;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 </style>

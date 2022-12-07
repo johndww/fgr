@@ -1,52 +1,21 @@
 <template>
   <div class="main-container">
     <div class="header">
-      <div><img src="./assets/logo.svg" alt="SimpleGiftApp" width="35" height="35" class="logo">
-      <div class="header-name">SimpleGift</div>
+      <div>
+        <img src="./assets/logo.svg" alt="SimpleGiftApp" width="35" height="35" class="logo">
+        <div class="header-name">SimpleGift</div>
       </div>
       <div v-show="currentUserState.data" class="logged-in-user">
-        <img src="./assets/user_icon_blue.svg" alt="UserIcon" width="24px" height="24px" class="user-icon">
+        <img src="./assets/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
         <a @click="logout" class="user">{{ currentUserState.data != null && currentUserState.data.name }}</a>
-        <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser">Admin</a>
+        <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser"
+           class="admin">Admin</a>
       </div>
-<!--      <div v-show="currentUserState.data" style="text-align: right">-->
-<!--        <a @click="logout">{{ currentUserState.data != null && currentUserState.data.name }}</a><br/>-->
-<!--        <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser">Admin</a>-->
-<!--      </div>-->
     </div>
     <div class="content">
       <router-view></router-view>
     </div>
   </div>
-
-
-  <!--  <div class="vh-100" style="background-color: #3da2c3;">-->
-<!--    <div class="container py-5 h-100">-->
-<!--      <div class="row d-flex justify-content-center align-items-center h-100">-->
-<!--        <div class="col col-lg-9 col-xl-7">-->
-<!--          <div class="card rounded-3">-->
-<!--            <div class="card-body p-4">-->
-
-<!--              <div v-show="currentUserState.data">-->
-<!--                <nav class="navbar navbar-light bg-light">-->
-<!--                  <div class="container-fluid">-->
-<!--                    <router-link :to="{name: 'selectevent'}" class="navbar-brand" >Events</router-link>-->
-
-<!--                    <div style="text-align: right">-->
-<!--                      <a @click="logout" >{{ currentUserState.data != null && currentUserState.data.name }}</a><br />-->
-<!--                      <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser">Admin</a>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </nav>-->
-<!--              </div>-->
-
-<!--              <router-view></router-view>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
 
 </template>
 
@@ -135,6 +104,7 @@ body {
   /* UI Properties */
   background: #FBFDFF 0% 0% no-repeat padding-box;
   border-radius: 10px 10px 0px 0px;
+  box-shadow: 0px 0px 20px #0000000D;
   line-height: 77px;
   display: flex;
   justify-content: space-between;
@@ -170,14 +140,15 @@ body {
   margin-right: 22px;
 }
 
+.admin {
+  vertical-align: middle;
+  margin-right: 22px;
+}
+
 .content {
   text-align: center;
-  padding-top: 71px;
   width: 100%;
-  box-shadow: 0px 0px 20px #0000000D;
   border-radius: 10px;
-  position: relative;
-  padding-bottom: 300px;
 }
 
 h1 {
@@ -185,14 +156,25 @@ h1 {
   color: #233D6E;
 }
 
+/* for subpages */
+.event-header {
+  width: 100%;
+  height: 115px;
+  background: #233D6E 0% 0% no-repeat padding-box;
+  display: flex;
+  justify-content: space-between;
+}
+
+.event-header-title {
+  display: inline-block;
+  vertical-align: middle;
+}
+/* end for subpages */
+
 #app {
   font-family: 'Proxima Nova', Georgia, sans-serif;
   padding: 60px 0;
   box-sizing: border-box;
   min-height: 100vh;
-  /*-webkit-font-smoothing: antialiased;*/
-  /*-moz-osx-font-smoothing: grayscale;*/
-  /*text-align: center;*/
-  /*color: #2c3e50;*/
 }
 </style>

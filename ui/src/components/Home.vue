@@ -1,10 +1,13 @@
 <template>
-  <h1>Welcome</h1>
-  <p class="welcome-message"><b>SimpleGift</b> is a simple app that lets friends and families organize gifting for holidays like Christmas, without duplicating gifts to anyone or spoiling the gift surprise.</p>
-  <div>
-    <GoogleLogin :callback="gCallback" />
+  <div class="home-content">
+    <h1>Welcome</h1>
+    <p class="welcome-message"><b>SimpleGift</b> is a simple app that lets friends and families organize gifting for
+      holidays like Christmas, without duplicating gifts to anyone or spoiling the gift surprise.</p>
+    <div>
+      <GoogleLogin :callback="gCallback"/>
+    </div>
+    <img src="../assets/welcome.svg" alt="SimpleGiftApp" width="570" height="235" class="welcome-img">
   </div>
-  <img src="../assets/welcome.svg" alt="SimpleGiftApp" width="570" height="235" class="welcome-img">
 </template>
 
 <script lang="ts">
@@ -18,7 +21,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
 
-    const selectUser = function() {
+    const selectUser = function () {
       router.push({
         name: "selectuser"
       })
@@ -52,12 +55,16 @@ export default defineComponent({
   max-width: calc(100% - 40px);
 }
 
+.home-content {
+  position: relative;
+  padding-bottom: 300px;
+}
+
 .welcome-img {
   margin-top: 89px;
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translate(-50%);
-
 }
 </style>
