@@ -6,7 +6,7 @@
         <div class="header-name">SimpleGift</div>
       </div>
       <div v-show="currentUserState.data" class="logged-in-user">
-        <img src="./assets/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
+        <img src="@/assets/user_icons/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
         <a @click="logout" class="user">{{ currentUserState.data != null && currentUserState.data.name }}</a>
         <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser"
            class="admin">Admin</a>

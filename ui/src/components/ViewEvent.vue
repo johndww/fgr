@@ -21,7 +21,7 @@
         <!-- selected user-->
         <div v-if="user.id === this.viewResultsUserId" class="member-selected-container">
           <div class="member-selected">
-            <img src="../assets/user_icon_empty.svg" alt="User" width="28" height="29" class="member-icon">
+            <img src="@/assets/user_icons/user_icon_empty.svg" alt="User" width="28" height="29" class="member-icon">
             <span class="member-name-selected">{{ user.name }}</span>
           </div>
           <div class="user-selected-arrow"></div>
@@ -146,16 +146,16 @@ export default {
       persistReleaseGift(eventId, giftId, releaseGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
 
-    const userIcon = function(index: number) {
+    const userIcon = function (index: number) {
       const icons = [
-          "user_icon_blue.svg",
-          "user_icon_pink.svg",
-          "user_icon_purple.svg",
-          "user_icon_yellow.svg",
+        "user_icon_blue.svg",
+        "user_icon_pink.svg",
+        "user_icon_purple.svg",
+        "user_icon_yellow.svg",
       ]
 
       const iconIdx = index % icons.length
-      return new URL(`../assets/${icons[iconIdx]}`, import.meta.url).href
+      return new URL(`/src/assets/icons/${icons[iconIdx]}`, import.meta.url).href
     }
 
     return {

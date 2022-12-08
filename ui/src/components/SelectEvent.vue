@@ -30,36 +30,11 @@
             <span class="event-author">by John</span>
           </div>
           <div class="event-member-count">
-            <img src="../assets/user_icon_empty.svg" alt="UserIcon" width="24" height="24" class="user-icon">
+            <img src="@/assets/user_icons/user_icon_empty.svg" alt="UserIcon" width="24" height="24" class="user-icon">
             <span class="member-count">5 Members</span>
           </div>
         </div>
       </div>
-
-
-<!--        <div class="event-container">-->
-<!--          <div>-->
-<!--            <span class="event-name">Tapas 2022 Christmas</span>-->
-<!--            <span class="event-author">by Haritha</span>-->
-<!--          </div>-->
-<!--          <div class="event-member-count">-->
-<!--            <img src="../assets/user_icon_empty.svg" alt="UserIcon" width="24" height="24" class="user-icon">-->
-<!--            <span class="member-count">2 Members</span>-->
-<!--          </div>-->
-<!--        </div>-->
-
-
-<!--          <div class="event-container">-->
-<!--            <div>-->
-<!--              <span class="event-name">Wrights 2022 Christmas</span>-->
-<!--              <span class="event-author">by John</span>-->
-<!--            </div>-->
-<!--            <div class="event-member-count">-->
-<!--              <img src="../assets/user_icon_empty.svg" alt="UserIcon" width="24" height="24" class="user-icon">-->
-<!--              <span class="member-count">3 Members</span>-->
-<!--            </div>-->
-<!--          </div>-->
-
 
     </div>
 
@@ -70,19 +45,7 @@
       </form>
     </div>
   </div>
-<!--  <div>-->
-<!--    <h1 class="text-center my-3 pb-3">Select Event</h1>-->
 
-<!--    <div v-if="!myEventsState.loading && !myEventsState.error">-->
-<!--    <ul>-->
-<!--      <li v-for="event in myEventsState.data" :key="event.id"><button @click="selectEvent(event.id)">{{ event.name }}</button></li>-->
-<!--    </ul>-->
-<!--    <form @submit="onCreateEvent">-->
-<!--      <input name="name" v-model="eventNameToCreate"> <button type="submit">Create Event</button>-->
-<!--    </form>-->
-<!--    </div>-->
-<!--    <LoadingOrError :loading="myEventsState.loading" :error="myEventsState.error"></LoadingOrError>-->
-<!--  </div>-->
 </template>
 
 <script lang="ts">
