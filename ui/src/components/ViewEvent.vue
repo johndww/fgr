@@ -2,10 +2,10 @@
   <div class="view-event-contents">
     <div class="event-header">
       <div class="view-event-title">
-        <h3 class="event-header-title-back">&lt All Events</h3>
-        <h1 class="event-header-title">Wrights 2022 Christmas</h1>
+        <router-link class="event-header-title-back" :to="{name: 'selectevent'}">&lt All Events</router-link>
+        <h1 class="event-header-title">{{ this.event.name }}</h1>
       </div>
-      <div>
+      <div class="present-icon-container">
         <img src="../assets/present_icon.svg" alt="SimpleGiftApp" width="124" height="115">
       </div>
     </div>
@@ -147,16 +147,15 @@ export default {
     }
 
     const userIcon = function(index: number) {
-      //TODO why is src needed..
       const icons = [
-          "../src/assets/user_icon_blue.svg",
-          "../src/assets/user_icon_pink.svg",
-          "../src/assets/user_icon_purple.svg",
-          "../src/assets/user_icon_yellow.svg",
+          "user_icon_blue.svg",
+          "user_icon_pink.svg",
+          "user_icon_purple.svg",
+          "user_icon_yellow.svg",
       ]
 
       const iconIdx = index % icons.length
-      return icons[iconIdx]
+      return new URL(`../assets/${icons[iconIdx]}`, import.meta.url).href
     }
 
     return {
@@ -199,6 +198,7 @@ export default {
   display: block;
   margin: 0px;
   text-align: left;
+  text-decoration: none;
 }
 
 .event-header-title {
@@ -210,12 +210,18 @@ export default {
   text-align: left;
 }
 
+.present-icon-container {
+  display: flex;
+  align-items: flex-end;
+}
+
 .event-members {
   display: flex;
+  flex-wrap: wrap;
   column-gap: 9px;
-  width: 100%;
   margin-top: 34px;
   margin-left: 91px;
+  margin-right: 91px;
 }
 
 .member {

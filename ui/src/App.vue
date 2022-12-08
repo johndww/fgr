@@ -159,7 +159,7 @@ h1 {
 /* for subpages */
 .event-header {
   width: 100%;
-  height: 115px;
+  min-height: 115px;
   background: #233D6E 0% 0% no-repeat padding-box;
   display: flex;
   justify-content: space-between;
