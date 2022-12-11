@@ -88,6 +88,16 @@ body {
   padding: 0;
 }
 
+h1 {
+  color: #FFFFFF;
+  font: normal normal 600 42px/52px Proxima Nova;
+}
+
+h2 {
+  color: #2F3237;
+  font: normal normal bold 32px/39px Proxima Nova;
+}
+
 .main-container {
   margin: 0 auto;
   width: 1119px;
@@ -98,10 +108,8 @@ body {
 }
 
 .header {
-  /* Layout Properties */
   height: 77px;
   width: 100%;
-  /* UI Properties */
   background: #FBFDFF 0% 0% no-repeat padding-box;
   border-radius: 10px 10px 0px 0px;
   box-shadow: 0px 0px 20px #0000000D;
@@ -151,11 +159,6 @@ body {
   border-radius: 10px;
 }
 
-h1 {
-  font: normal normal bold 46px/56px Proxima Nova;
-  color: #233D6E;
-}
-
 /* for subpages */
 .event-header {
   width: 100%;
@@ -168,7 +171,87 @@ h1 {
 .event-header-title {
   display: inline-block;
   vertical-align: middle;
+  margin: 0px;
 }
+
+.present-icon-container {
+  display: flex;
+  align-items: flex-end;
+}
+
+.view-event-title {
+  margin-left: 91px;
+  padding-top: 26px;
+}
+
+.event-header-title-back {
+  font: normal normal bold 14px/17px Proxima Nova;
+  letter-spacing: 0.7px;
+  color: #89BF60;
+  text-transform: uppercase;
+  display: block;
+  margin: 0px;
+  text-align: left;
+  text-decoration: none;
+}
+
+.delete-button {
+  border: none;
+  background: none;
+  width: 120px;
+  height: 42px;
+  font: normal normal bold 14px/17px Proxima Nova;
+  letter-spacing: 0.7px;
+  text-align: left;
+  color: #89BF60;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.button {
+  background: #89BF60 0% 0% no-repeat padding-box;
+  border-radius: 6px;
+  width: 177px;
+  height: 46px;
+  text-align: center;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-button {
+  width: 266px;
+  height: 46px;
+  background: #89BF60 0% 0% no-repeat padding-box;
+  border-width: 0px;
+  border-radius: 6px;
+  text-align: center;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.border-only-button {
+  border: 2px solid #89BF60;
+  border-radius: 6px;
+  width: 177px;
+  height: 42px;
+  text-align: center;
+  font: normal normal bold 16px/19px Proxima Nova;
+  letter-spacing: 0px;
+  color: #89BF60;
+  text-transform: uppercase;
+  background: none;
+  cursor: pointer;
+}
+
 /* end for subpages */
 
 #app {

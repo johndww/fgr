@@ -1,6 +1,6 @@
 <template>
   <div class="home-content">
-    <h1>Welcome</h1>
+    <h1 class="welcome-header">Welcome</h1>
     <p class="welcome-message"><b>SimpleGift</b> is a simple app that lets friends and families organize gifting for
       holidays like Christmas, without duplicating gifts to anyone or spoiling the gift surprise.</p>
     <div>
@@ -45,6 +45,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+.welcome-header {
+  font: normal normal bold 46px/56px Proxima Nova;
+  color: #233D6E;
+}
 
 .welcome-message {
   margin-top: 19px;

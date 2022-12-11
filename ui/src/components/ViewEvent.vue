@@ -45,7 +45,7 @@
 
       <div class="item-claim" v-for="gift in unassignedGifts" :key="gift.name">
         <div class="item-name">{{ gift.name }}</div>
-        <button class="claim-gift-button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
+        <button class="button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
       </div>
 
       <div class="item-release" v-for="gift in assignedGifts" :key="gift.name">
@@ -60,9 +60,9 @@
     <div class="delete-edit-event-footer">
       <div class="delete-event">
         <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
-        <button class="delete-event-button">Delete Event</button>
+        <button class="delete-button">Delete Event</button>
       </div>
-      <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}" v-if="this.event.ownerUserId === currentUserId"><button class="edit-event-button">Edit Event</button></router-link>
+      <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}" v-if="this.event.ownerUserId === currentUserId"><button class="button">Edit Event</button></router-link>
     </div>
 
   </div>
@@ -155,7 +155,7 @@ export default {
       ]
 
       const iconIdx = index % icons.length
-      return new URL(`/src/assets/icons/${icons[iconIdx]}`, import.meta.url).href
+      return new URL(`/src/assets/user_icons/${icons[iconIdx]}`, import.meta.url).href
     }
 
     return {
@@ -183,36 +183,6 @@ export default {
 
 .view-event-contents {
   padding-bottom: 62px;
-}
-
-.view-event-title {
-  margin-left: 91px;
-  padding-top: 26px;
-}
-
-.event-header-title-back {
-  font: normal normal bold 14px/17px Proxima Nova;
-  letter-spacing: 0.7px;
-  color: #89BF60;
-  text-transform: uppercase;
-  display: block;
-  margin: 0px;
-  text-align: left;
-  text-decoration: none;
-}
-
-.event-header-title {
-  font: normal normal 600 42px/52px Proxima Nova;
-  letter-spacing: 0px;
-  color: #FFFFFF;
-  display: block;
-  margin: 0px;
-  text-align: left;
-}
-
-.present-icon-container {
-  display: flex;
-  align-items: flex-end;
 }
 
 .event-members {
@@ -320,20 +290,6 @@ export default {
   color: #2F3237;
 }
 
-.claim-gift-button {
-  background: #89BF60 0% 0% no-repeat padding-box;
-  border-radius: 6px;
-  width: 177px;
-  height: 46px;
-  text-align: center;
-  font: normal normal bold 16px/19px Proxima Nova;
-  letter-spacing: 0px;
-  color: #FFFFFF;
-  text-transform: uppercase;
-  border: none;
-  cursor: pointer;
-}
-
 .release-gift-button {
   width: 177px;
   height: 46px;
@@ -354,38 +310,9 @@ export default {
   margin: 20px 91px 0px;
 }
 
-.delete-event-button {
-  border: none;
-  background: none;
-  width: 120px;
-  height: 42px;
-  font: normal normal bold 14px/17px Proxima Nova;
-  letter-spacing: 0.7px;
-  text-align: left;
-  color: #89BF60;
-  text-transform: uppercase;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-}
-
 .trash-icon {
   display: inline-block;
   vertical-align: middle;
-}
-
-.edit-event-button {
-  width: 177px;
-  height: 42px;
-  border: none;
-  background: #89BF60 0% 0% no-repeat padding-box;
-  border-radius: 6px;
-  text-align: center;
-  font: normal normal bold 16px/19px Proxima Nova;
-  letter-spacing: 0px;
-  color: #FFFFFF;
-  text-transform: uppercase;
-  cursor: pointer;
 }
 
 </style>

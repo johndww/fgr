@@ -5,7 +5,7 @@
         <h1 class="event-header-title">Events</h1>
         <span class="add-event-circle plus"></span>
       </div>
-      <div>
+      <div class="present-icon-container">
         <img src="../assets/present_icon.svg" alt="SimpleGiftApp" width="124" height="115">
       </div>
     </div>
@@ -41,7 +41,7 @@
     <div class="create-event">
       <form @submit="onCreateEvent">
         <input name="name" class="create-event-name" v-model="eventNameToCreate">
-        <button type="submit" class="create-event-submit">Create new event</button>
+        <button type="submit" class="submit-button">Create new event</button>
       </form>
     </div>
   </div>
@@ -111,6 +111,8 @@ export default {
 
 .add-events {
   margin-left: 91px;
+  display: flex;
+  align-items: center;
 }
 
 .add-event-circle {
@@ -154,16 +156,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-}
-
-h1 {
-  color: #FFFFFF;
-  font: normal normal 600 42px/52px Proxima Nova;
-}
-
-h2 {
-  color: #2F3237;
-  font: normal normal bold 32px/39px Proxima Nova;
 }
 
 .year {
@@ -236,7 +228,7 @@ select {
   padding-left: 13px;
 }
 
-.create-event-submit {
+.submit-button {
   width: 266px;
   height: 46px;
   background: #89BF60 0% 0% no-repeat padding-box;
@@ -247,6 +239,7 @@ select {
   letter-spacing: 0px;
   color: #FFFFFF;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 </style>
