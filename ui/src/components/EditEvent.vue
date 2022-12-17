@@ -15,9 +15,10 @@
                       :error="this.getEventUsersState.error"></LoadingOrError>
     </div>
 
+    <form @submit="updateEvent">
     <div class="event-name">
       <span class="event-name-input-title">Event Name</span>
-      <input class="event-name-input" name="event-name"/>
+      <input type="text" class="event-name-input" v-model="eventName" />
     </div>
 
     <h2 class="members">Members</h2>
@@ -27,59 +28,64 @@
 
       <div class="member">
         <div class="member-logo-name">
-          <img class="member-icon" src="../assets/user_icons/user_icon_pink.svg" alt="UserIcon" width="24"
+          <img class="member-icon" src="../assets/user_icons/user_icon_purple.svg" alt="UserIcon" width="24"
                height="24">
-          <span class="member-name">Haritha</span>
+          <span class="member-name">{{ currentUserState.data.email}}</span>
         </div>
 
-        <span class="member-email">haritha@gmail.com</span>
+<!--        <span class="member-email">{{ currentUserState.data.email }}</span>-->
 
         <div class="owner-or-trash">
           <span class="member-owner">Owner</span>
         </div>
       </div>
 
-      <div class="member">
+      <div class="member" v-for="(user, userIdx) in updateUserList" :key="userIdx">
         <div class="member-logo-name">
-          <img class="member-icon" src="../assets/user_icons/user_icon_blue.svg" alt="UserIcon" width="24"
+          <img class="member-icon" :src="userIcon(userIdx)" alt="UserIcon" width="24"
                height="24">
-          <span class="member-name">John</span>
+          <span class="member-name">{{ user.email }}</span>
         </div>
 
-        <span class="member-email">john@gmail.com</span>
+<!--        <span class="member-email">{{ user.email }}</span>-->
 
         <div class="owner-or-trash">
-          <img class="member-trash" src="../assets/trash.svg" alt="Trash" width="18" height="16">
+          <img class="member-trash" src="../assets/trash.svg" alt="Trash" width="18" height="16" @click="deleteUser(userIdx)">
         </div>
       </div>
     </div>
 
-    <h2 class="members">Add New Member</h2>
+      <h2 class="members">Add New Member</h2>
 
-    <div class="new-member-container">
-      <div class="new-member-name">
-        <span class="input-title">Name</span>
-        <input class="new-member-input" />
+      <datalist id="recentUserList">-->
+        <option v-for="recentUser in recentUsers">{{ recentUser.email }}</option>
+      </datalist>
+
+      <div class="new-member-container">
+<!--        <div class="new-member-name">-->
+<!--          <span class="input-title">Name</span>-->
+<!--          <input class="new-member-input" v-model="newUser.name">-->
+<!--        </div>-->
+
+        <div class="new-member-email">
+          <span class="input-title">Email</span>
+          <input class="new-member-input" list="recentUserList"  v-model="newUser.email">
+        </div>
+
+        <div class="new-member-button-container">
+          <span class="input-title">&nbsp;</span>
+          <button class="border-only-button" type="button" @click="addNewMember">Add Member</button>
+        </div>
       </div>
 
-      <div class="new-member-email">
-        <span class="input-title">Email</span>
-        <input class="new-member-input" />
+      <div class="delete-save-event-footer">
+        <div class="delete-event">
+          <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
+          <button class="delete-button" type="button">Delete Event</button>
+        </div>
+        <button class="button" type="submit">Save Changes</button>
       </div>
-
-      <div class="new-member-button-container">
-        <span class="input-title">&nbsp;</span>
-        <button class="border-only-button">Add Member</button>
-      </div>
-    </div>
-
-    <div class="delete-save-event-footer">
-      <div class="delete-event">
-        <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
-        <button class="delete-button">Delete Event</button>
-      </div>
-      <button class="button">Edit Event</button>
-    </div>
+    </form>
   </div>
 
   <!--  <LoadingOrError :loading="getEventUsersState.loading" :error="getEventUsersState.error"></LoadingOrError>-->
@@ -135,7 +141,7 @@
 
 import {getUsersForEvent, useCurrentUserState, useCurrentUserId} from "../state/users";
 import {useRoute, useRouter} from "vue-router";
-import {useMyEventsState, persistUpdateEvent} from "../state/events";
+import {useMyEventsState, persistUpdateEvent, MembersToAdd} from "../state/events";
 import {computed, Ref, ref, watch, watchEffect} from "vue";
 import {User} from "../App.vue";
 import {State} from "../state/store";
@@ -164,13 +170,26 @@ export default {
       eventName.value = event.value?.name || ""
     })
 
-    const updateUserList: Ref<{ email: string }[]> = ref([])
+    const userIcon = function (index: number) {
+      const icons = [
+        "user_icon_blue.svg",
+        "user_icon_pink.svg",
+        // "user_icon_purple.svg",
+        "user_icon_yellow.svg",
+      ]
+
+      const iconIdx = index % icons.length
+      return new URL(`/src/assets/user_icons/${icons[iconIdx]}`, import.meta.url).href
+    }
+
+    const updateUserList: Ref<{email: string }[]> = ref([])
 
     const currentUserState = useCurrentUserState()
 
     const router = useRouter()
 
     const updateEvent = function (e: any) {
+      console.log("updateEvent called")
       e.preventDefault()
 
       if (!eventName.value) {
@@ -204,8 +223,24 @@ export default {
       updateUserList.value.splice(userIdx, 1)
     }
 
+    const newUser = ref({email: ""})
+
     const addNewMember = function () {
-      updateUserList.value.push({email: ""})
+      if (newUser.value.email === "") {
+        alert("Must provide an email")
+        return
+      }
+
+      const userAlreadyExists = updateUserList.value.find((existingUser) => {
+        return existingUser.email === newUser.value.email
+      })
+
+      if (userAlreadyExists) {
+        alert("Duplicate email found: " + userAlreadyExists.email)
+        return
+      }
+
+      updateUserList.value.push({email: newUser.value.email})
     }
 
     const allEventsUsers: Ref<User[]> = ref([])
@@ -254,8 +289,10 @@ export default {
 
     return {
       getEventUsersState,
+      userIcon,
       event,
       eventName,
+      newUser,
       updateUserList,
       currentUserState,
       updateEvent,
@@ -292,6 +329,9 @@ export default {
 }
 
 .event-name-input {
+  font: normal normal 600 16px/22px Proxima Nova;
+  letter-spacing: 0px;
+  color: #2F3237;
   width: 450px;
   height: 42px;
   border: 1px solid #E9E9E9;
@@ -321,9 +361,8 @@ export default {
   border-radius: 10px;
   height: 79px;
   display: inline-grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto;
   align-items: center;
-
 }
 
 .member-logo-name {
@@ -362,6 +401,7 @@ export default {
 
 .new-member-container {
   display: flex;
+  justify-content: space-between;
   height: 105px;
   align-items: center;
   column-gap: 25px;
@@ -372,10 +412,10 @@ export default {
   padding-right: 32px;
 }
 
-.new-member-name {
-  display: flex;
-  flex-direction: column;
-}
+/*.new-member-name {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*}*/
 
 .input-title {
   text-align: left;
@@ -388,7 +428,7 @@ export default {
 .new-member-input {
   border: 1px solid #E9E9E9;
   border-radius: 6px;
-  width: 325px;
+  width: 525px;
   height: 42px;
 }
 
@@ -406,6 +446,10 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+}
+
+.member-trash {
+  cursor: pointer;
 }
 
 </style>

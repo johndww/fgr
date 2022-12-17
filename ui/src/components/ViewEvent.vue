@@ -57,12 +57,12 @@
 
     </div>
 
-    <div class="delete-edit-event-footer">
+    <div class="delete-edit-event-footer" v-if="this.event.ownerUserId === currentUserId">
       <div class="delete-event">
         <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
         <button class="delete-button">Delete Event</button>
       </div>
-      <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}" v-if="this.event.ownerUserId === currentUserId"><button class="button">Edit Event</button></router-link>
+      <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}"><button class="button">Edit Event</button></router-link>
     </div>
 
   </div>
