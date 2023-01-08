@@ -227,16 +227,17 @@ type CsrfResponse struct {
 }
 
 func (u UserGateway) Csrf(w http.ResponseWriter, r *http.Request) {
-	userId, err := pkg.UserIdFromContext(r.Context())
+	cookie, err := r.Cookie(pkg.SessionCookieName)
 	if err != nil {
-		logrus.WithError(err).Error("unable to pull userid from context")
-		w.WriteHeader(http.StatusInternalServerError)
+		logrus.WithError(err).Error("no session cookie found when looking up CSRF")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	sessionId := cookie.Value
 
-	csrf, err := u.UserService.GetCsrf(userId)
+	csrf, err := u.UserService.GetCsrf(sessionId)
 	if err != nil {
-		logrus.WithError(err).Error("unable to pull userid from context")
+		logrus.WithError(err).Error("unable to get CSRF for session")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

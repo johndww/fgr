@@ -487,35 +487,16 @@ func (d Database) CreateSessionAndDeactivateOld(userId string) (*Session, error)
 		return nil, errors.Wrap(err, "unable to create session")
 	}
 
-	_, err = txn.Exec(context.Background(), "UPDATE sessions SET active = false WHERE user_id = $1 AND id != $2", userId, session.Id)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to update session to deactivate previously active sessions")
-	}
+	//_, err = txn.Exec(context.Background(), "UPDATE sessions SET active = false WHERE user_id = $1 AND id != $2", userId, session.Id)
+	//if err != nil {
+	//	return nil, errors.Wrap(err, "unable to update session to deactivate previously active sessions")
+	//}
 
 	err = txn.Commit(context.Background())
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to commit txn for creating a session")
 	}
 	return &session, nil
-}
-
-func (d Database) ReadSessionForUser(userId string) (*Session, error) {
-	row := d.Pool.QueryRow(context.Background(), "SELECT id, csrf_token, active FROM sessions WHERE user_id = $1", userId)
-
-	var id string
-	var csrfToken string
-	var active bool
-	err := row.Scan(&id, &csrfToken, &active)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read session for userid")
-	}
-
-	return &Session{
-		Id:        id,
-		UserId:    userId,
-		CsrfToken: csrfToken,
-		Active:    active,
-	}, nil
 }
 
 func noRowsFoundError(err error) bool {

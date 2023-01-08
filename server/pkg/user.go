@@ -110,15 +110,17 @@ func (u UserService) GoogleLogin(token string) (*Session, error) {
 	return u.Database.CreateSessionAndDeactivateOld(user.Id)
 }
 
-func (u UserService) GetCsrf(userId string) (string, error) {
-	session, err := u.Database.ReadSessionForUser(userId)
+func (u UserService) GetCsrf(sessionId string) (string, error) {
+	session, err := u.Database.ReadSession(sessionId)
 	if err != nil {
 		return "", err
 	}
 
-	if !session.Active {
-		return "", errors.New("session is not active")
-	}
+	//if !session.Active {
+	//	err := errors.New("session is not active")
+	//	logrus.WithError(err).WithField("sessionId", session.Id).WithField("userId", userId).Error("unable to get csrf token")
+	//	return "", err
+	//}
 	return session.CsrfToken, nil
 }
 

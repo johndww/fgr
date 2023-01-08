@@ -34,7 +34,8 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if session == nil || !session.Active {
+		if session == nil {
+			//if session == nil || !session.Active {
 			logrus.WithField("sessionId", session.Id).Warn("no session found or session not active")
 			w.WriteHeader(http.StatusForbidden)
 			return
