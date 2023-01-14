@@ -26,6 +26,10 @@ func (e EventService) CreateEvent(name string, ownerUserId string) (string, erro
 	return event.Id, err
 }
 
+func (e EventService) DeleteEvent(eventId string, ownerUserId string) error {
+	return e.Database.DeleteEvent(eventId, ownerUserId)
+}
+
 // GetEventForUser gets an event, just ensure the user is a member of that event
 func (e EventService) GetEventForUser(eventId string, userId string) (*Event, error) {
 	return e.Database.ReadEventForUser(eventId, userId)
@@ -35,8 +39,14 @@ func (e EventService) UpdateEvent(eventId string, userId string, name string, em
 	return e.Database.UpdateEvent(eventId, userId, name, emails)
 }
 
-func (e EventService) GetEventsForUser(userId string) ([]Event, error) {
+func (e EventService) GetEventsForUser(userId string) ([]EventWithDetails, error) {
 	return e.Database.ReadEventsForUser(userId)
+}
+
+type EventWithDetails struct {
+	Event
+	MembershipCount int    `json:"membershipCount"`
+	OwnerName       string `json:"ownerName"`
 }
 
 type Event struct {

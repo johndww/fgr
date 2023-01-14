@@ -16,10 +16,10 @@
       <div class="title-and-date">
         <h2>Pick an event:</h2>
         <div class="date-container">
-          <span class="year">Year</span>
-          <select>
-            <option>2022</option>
-          </select>
+<!--          <span class="year">Year</span>-->
+<!--          <select>-->
+<!--            <option>2022</option>-->
+<!--          </select>-->
         </div>
       </div>
 
@@ -27,11 +27,11 @@
         <div class="event-container" v-for="event in myEventsState.data" v-on:click="selectEvent(event.id)">
           <div>
             <span class="event-name">{{ event.name }}</span>
-            <span class="event-author">by John</span>
+            <span class="event-author">by {{ event.ownerName }}</span>
           </div>
           <div class="event-member-count">
             <img src="@/assets/user_icons/user_icon_empty.svg" alt="UserIcon" width="24" height="24" class="user-icon">
-            <span class="member-count">5 Members</span>
+            <span class="member-count">{{ event.membershipCount }} Members</span>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
 
     <div class="create-event">
       <form @submit="onCreateEvent">
-        <input name="name" class="create-event-name" v-model="eventNameToCreate">
+        <input name="name" class="create-event-name" placeholder="Event Name..." v-model="eventNameToCreate">
         <button type="submit" class="submit-button">Create new event</button>
       </form>
     </div>

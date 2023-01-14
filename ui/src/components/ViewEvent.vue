@@ -36,23 +36,29 @@
       </div>
     </div>
 
-    <SelfGiftResults @add-gift="(giftToAdd) => addGift(giftToAdd)"
+    <SelfGiftResults @add-gift="(giftToAdd, description) => addGift(giftToAdd, description)"
                      @delete-gift="(giftId) => deleteGift(giftId)"
                      :eventId="this.event.id" :giftRequestState="giftRequestState"
                      v-if="this.viewResultsUser && currentUserId === this.viewResultsUserId"/>
 
     <div class="items" v-if="this.viewResultsUser && currentUserId !== this.viewResultsUserId">
 
-      <div class="item-claim" v-for="gift in unassignedGifts" :key="gift.name">
-        <div class="item-name">{{ gift.name }}</div>
-        <button class="button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
+      <div class="item-container" v-for="gift in unassignedGifts" :key="gift.name">
+        <div class="item-claim">
+          <div class="item-name">{{ gift.name }}</div>
+          <button class="button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
+        </div>
+        <div class="gift-description">{{ gift.description }}</div>
       </div>
 
-      <div class="item-release" v-for="gift in assignedGifts" :key="gift.name">
-        <div class="item-name">{{ gift.name }}</div>
-        <template v-if="gift.isAssignedToMe">
-          <button class="release-gift-button" @click="releaseGift(gift.id)">Release Gift</button>
-        </template>
+      <div class="item-container" v-for="gift in assignedGifts" :key="gift.name">
+        <div class="item-release">
+          <div class="item-name">{{ gift.name }}</div>
+          <template v-if="gift.isAssignedToMe">
+            <button class="release-gift-button" @click="releaseGift(gift.id)">Release Gift</button>
+          </template>
+        </div>
+        <div class="gift-description">{{ gift.description }}</div>
       </div>
 
     </div>
@@ -60,11 +66,10 @@
     <div class="delete-edit-event-footer" v-if="this.event.ownerUserId === currentUserId">
       <div class="delete-event">
         <img src="../assets/trash.svg" alt="User" width="18" height="16" class="trash-icon">
-        <button class="delete-button">Delete Event</button>
+        <button class="delete-button" @click="deleteEvent(event.id)">Delete Event</button>
       </div>
       <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}"><button class="button">Edit Event</button></router-link>
     </div>
-
   </div>
 
 </template>
@@ -74,10 +79,10 @@
 import {computed, ref} from "vue";
 import {User} from "../App.vue";
 import {getUsersForEvent, useCurrentUserId} from "../state/users";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {
   getGiftRequests,
-  persistClaimGift,
+  persistClaimGift, persistDeleteEvent,
   persistDeleteGiftRequest,
   persistGiftRequest, persistReleaseGift,
   useMyEventsState
@@ -125,6 +130,18 @@ export default {
       return giftRequestState.value.data.filter(request => request.userId == viewResultsUserId.value && request.isAssigned)
     })
 
+    const router = useRouter()
+
+    const deleteEventState = ref({data: "", loading: false, error: ""})
+    const deleteEvent = function(eventId: string) {
+      if (confirm("Are you sure you want to delete this event?")) {
+        persistDeleteEvent(eventId, deleteEventState).finally(() => {
+          console.log("event deleted. redirecting to selectevent")
+          router.push({ name: 'selectevent'})
+        })
+      }
+    }
+
     //TODO errors from these should get collated and displayed. need to rethink loading or error
     const claimGiftState = ref({data: "", loading: false, error: ""})
     const claimGift = function(giftId: string, byUserId: string) {
@@ -132,8 +149,8 @@ export default {
     }
 
     const addGiftState = ref({data: "", loading: false, error: ""})
-    const addGift = function(giftName: string) {
-      persistGiftRequest(giftName, eventId, addGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
+    const addGift = function(giftName: string, description: string) {
+      persistGiftRequest(giftName, description, eventId, addGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
 
     const deleteGiftState = ref({data: "", loading: false, error: ""})
@@ -164,6 +181,7 @@ export default {
       getEventUsersState,
       currentUserId,
       assignGift: claimGift,
+      deleteEvent,
       addGift,
       deleteGift,
       releaseGift,
@@ -260,11 +278,23 @@ export default {
   margin: 20px 91px 30px;
 }
 
-.item-claim {
-  height: 79px;
+.item-container{
+  min-height: 79px;
+  padding-top: 15px;
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #70707040;
   border-radius: 10px;
+}
+
+.gift-description {
+  text-align: left;
+  margin-left: 20px;
+  font: normal normal bold 12px/22px Proxima Nova;
+  white-space: pre-wrap;
+}
+
+.item-claim {
+  height: 79px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -274,9 +304,6 @@ export default {
 
 .item-release {
   height: 79px;
-  background: #FFFFFF 0% 0% no-repeat padding-box;
-  border: 1px solid #89BF60;
-  border-radius: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -307,7 +334,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 91px 0px;
+  margin: 20px 91px 10px;
 }
 
 .trash-icon {

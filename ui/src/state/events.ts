@@ -82,11 +82,12 @@ export function getGiftRequests(eventId: string, state: Ref<GetGiftRequestsState
 
 export interface PersistGiftRequestState extends State<string>{}
 
-export function persistGiftRequest(giftName: string, eventId: string, state: Ref<PersistGiftRequestState>) {
+export function persistGiftRequest(giftName: string, description: string, eventId: string, state: Ref<PersistGiftRequestState>) {
     state.value.loading = true
 
     return axios.post(backendV1Url + "/events/" + eventId + "/gift-requests/create", {
-        name: giftName
+        name: giftName,
+        description: description
     }, {
         withCredentials: true
     })
@@ -116,6 +117,25 @@ export function persistDeleteGiftRequest(eventId: string, giftId: string, state:
         .catch(err => {
             console.log("unable to delete gift request: " + err)
             state.value.error = "Unable to delete gift request"
+            return Promise.reject(err)
+        })
+        .finally(() => state.value.loading = false)
+}
+
+export interface DeleteEventState extends State<string>{}
+
+export function persistDeleteEvent(eventId: string, state: Ref<DeleteEventState>) {
+    state.value.loading = true
+
+    return axios.delete(backendV1Url + "/events/" + eventId + "/delete", {
+        withCredentials: true
+    })
+        .then(() => {
+            state.value.error = ""
+        })
+        .catch(err => {
+            console.log("unable to delete event: " + err)
+            state.value.error = "Unable to delete event"
             return Promise.reject(err)
         })
         .finally(() => state.value.loading = false)

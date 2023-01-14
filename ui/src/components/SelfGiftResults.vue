@@ -1,18 +1,24 @@
 <template>
 
   <div class="items">
-    <div class="item-delete" v-for="gift in myGifts" :key="gift.name">
-      <div class="item-name">{{ gift.name }}</div>
-      <button class="delete-gift-button" @click="deleteGift(gift.id)">Delete Gift</button>
+    <div class="item-container" v-for="gift in myGifts" :key="gift.name">
+      <div class="item-delete">
+        <div class="item-name">{{ gift.name }}</div>
+        <button class="delete-gift-button" @click="deleteGift(gift.id)">Delete Gift</button>
+      </div>
+      <div class="gift-description">{{gift.description}}</div>
     </div>
   </div>
 
-  <div class="create-gift">
-    <form @submit="addGift">
-      <input name="name" type="text" class="create-gift-name" v-model="giftToAdd"/>
+  <form @submit="addGift">
+    <div class="create-gift">
+      <input name="name" type="text" class="create-gift-name" placeholder="Gift Name..." v-model="giftToAdd"/>
+      <textarea name="description" class="create-gift-description" v-model="description"
+                placeholder="Description... (optional)"></textarea>
       <button type="submit" class="submit-button">Add Gift</button>
-    </form>
-  </div>
+    </div>
+  </form>
+
 
 </template>
 
@@ -34,6 +40,7 @@ export default defineComponent({
     })
 
     const giftToAdd = ref("")
+    const description = ref("")
     const addGift = function(e: any) {
       e.preventDefault()
 
@@ -44,9 +51,10 @@ export default defineComponent({
 
       //TODO prevent dup gifts
 
-      emit('add-gift', giftToAdd.value)
+      emit('add-gift', giftToAdd.value, description.value)
 
       giftToAdd.value = ''
+      description.value = ''
     }
 
     const deleteGift = function (giftIdToDelete: string) {
@@ -59,6 +67,7 @@ export default defineComponent({
 
     return {
       giftToAdd,
+      description,
       myGifts,
       addGift,
       deleteGift
@@ -77,16 +86,27 @@ export default defineComponent({
   margin: 20px 91px 30px;
 }
 
-.item-delete {
-  height: 79px;
+.item-container{
+  min-height: 79px;
+  padding-top: 15px;
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #70707040;
   border-radius: 10px;
+}
+
+.item-delete {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.gift-description {
+  text-align: left;
+  margin-left: 20px;
+  font: normal normal bold 12px/22px Proxima Nova;
+  white-space: pre-wrap;
 }
 
 .delete-gift-button {
@@ -103,16 +123,37 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.create-gift {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 91px 30px;
+  row-gap: 15px;
+}
+
 .create-gift-name {
   margin-right: 38px;
   border: 1px solid #E9E9E9;
   border-radius: 6px;
-  width: 325px;
+  width: 725px;
   height: 42px;
   font: normal normal 600 16px/22px Proxima Nova;
   letter-spacing: 0px;
   color: #2F3237;
   padding-left: 13px;
+}
+
+.create-gift-description {
+  margin-right: 38px;
+  border: 1px solid #E9E9E9;
+  border-radius: 6px;
+  width: 725px;
+  height: 100px;
+  font: normal normal 600 16px/22px Proxima Nova;
+  letter-spacing: 0px;
+  color: #2F3237;
+  padding-left: 13px;
+  resize: none;
+  white-space: pre-wrap;
 }
 
 </style>

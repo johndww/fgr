@@ -6,12 +6,13 @@ import (
 )
 
 type GiftRequestOutput struct {
-	Id             string `json:"id"`
-	UserId         string `json:"userId"`
-	EventId        string `json:"eventId"`
-	Name           string `json:"name"`
-	IsAssigned     bool   `json:"isAssigned"` // will always be false if gift request is for the logged in user
-	IsAssignedToMe bool   `json:"isAssignedToMe"`
+	Id             string  `json:"id"`
+	UserId         string  `json:"userId"`
+	EventId        string  `json:"eventId"`
+	Name           string  `json:"name"`
+	Description    *string `json:"description"`
+	IsAssigned     bool    `json:"isAssigned"` // will always be false if gift request is for the logged in user
+	IsAssignedToMe bool    `json:"isAssignedToMe"`
 }
 
 func (e EventService) GetGiftRequestsForEvent(eventId string, userId string) ([]GiftRequestOutput, error) {
@@ -25,10 +26,11 @@ func (e EventService) GetGiftRequestsForEvent(eventId string, userId string) ([]
 		if request.UserId == userId {
 			// user's gift
 			giftRequests = append(giftRequests, GiftRequestOutput{
-				Id:      request.Id,
-				UserId:  request.UserId,
-				EventId: request.EventId,
-				Name:    request.Name,
+				Id:          request.Id,
+				UserId:      request.UserId,
+				EventId:     request.EventId,
+				Name:        request.Name,
+				Description: request.Description,
 				// don't output details on isAssigned for logged in user's gifts
 			})
 		} else {
@@ -38,6 +40,7 @@ func (e EventService) GetGiftRequestsForEvent(eventId string, userId string) ([]
 				UserId:         request.UserId,
 				EventId:        request.EventId,
 				Name:           request.Name,
+				Description:    request.Description,
 				IsAssigned:     request.AssignedUserId != nil,
 				IsAssignedToMe: request.AssignedUserId != nil && *request.AssignedUserId == userId,
 			})
@@ -46,12 +49,13 @@ func (e EventService) GetGiftRequestsForEvent(eventId string, userId string) ([]
 	return giftRequests, nil
 }
 
-func (e EventService) CreateGiftRequest(eventId string, name string, userId string) (string, error) {
+func (e EventService) CreateGiftRequest(eventId string, name string, description *string, userId string) (string, error) {
 	request := GiftRequest{
 		Id:             uuid.New().String(),
 		UserId:         userId,
 		EventId:        eventId,
 		Name:           name,
+		Description:    description,
 		AssignedUserId: nil,
 	}
 
@@ -76,5 +80,6 @@ type GiftRequest struct {
 	UserId         string
 	EventId        string
 	Name           string
+	Description    *string
 	AssignedUserId *string
 }

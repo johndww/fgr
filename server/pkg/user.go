@@ -69,7 +69,7 @@ func (u UserService) AdminLogin(userId string) (*Session, error) {
 		return nil, errors.New("could not find user to login to")
 	}
 
-	return u.Database.CreateSessionAndDeactivateOld(user.Id)
+	return u.Database.CreateSession(user.Id)
 }
 
 func (u UserService) GoogleLogin(token string) (*Session, error) {
@@ -78,13 +78,13 @@ func (u UserService) GoogleLogin(token string) (*Session, error) {
 		return nil, errors.Wrap(err, "unable to validate google jwt")
 	}
 
-	user, err := u.Database.MapExternalIdToUser(payload.Subject, GoogleAuthSource)
+	existingUser, err := u.Database.MapExternalIdToUser(payload.Subject, GoogleAuthSource)
 	if err != nil {
 		return nil, err
 	}
 
-	if user != nil {
-		return u.Database.CreateSessionAndDeactivateOld(user.Id)
+	if existingUser != nil {
+		return u.Database.CreateSession(existingUser.Id)
 	}
 
 	// never seen this user before. create user in context
@@ -103,11 +103,11 @@ func (u UserService) GoogleLogin(token string) (*Session, error) {
 		Source:     GoogleAuthSource,
 	}
 
-	err = u.Database.WriteExternalUser(newUser, mapping)
+	updatedUser, err := u.Database.WriteExternalUser(newUser, mapping)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create new user from google login")
 	}
-	return u.Database.CreateSessionAndDeactivateOld(user.Id)
+	return u.Database.CreateSession(updatedUser.Id)
 }
 
 func (u UserService) GetCsrf(sessionId string) (string, error) {

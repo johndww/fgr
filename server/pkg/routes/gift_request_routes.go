@@ -43,7 +43,8 @@ func (u GiftRequestGateway) GetGiftRequestsHttp(w http.ResponseWriter, r *http.R
 }
 
 type GiftRequestInput struct {
-	Name string `json:"name"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
 }
 
 func (u GiftRequestGateway) CreateGiftRequestHttp(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +61,7 @@ func (u GiftRequestGateway) CreateGiftRequestHttp(w http.ResponseWriter, r *http
 		return
 	}
 
-	requestId, err := u.EventService.CreateGiftRequest(eventId, input.Name, userId)
+	requestId, err := u.EventService.CreateGiftRequest(eventId, input.Name, input.Description, userId)
 	if err != nil {
 		logrus.WithError(err).Error("unable to create gift request")
 		w.WriteHeader(http.StatusBadRequest)

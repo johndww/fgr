@@ -51,6 +51,27 @@ func (e EventGateway) CreateEventHttp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (e EventGateway) DeleteEventHttp(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+
+	userId, err := pkg.UserIdFromContext(r.Context())
+	if err != nil {
+		logrus.WithError(err).Error("unable to pull userid from context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = e.EventService.DeleteEvent(eventId, userId)
+	if err != nil {
+		logrus.WithError(err).Error("unable to delete event")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (e EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
@@ -83,7 +104,7 @@ func (e EventGateway) GetEventHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 type EventsOutput struct {
-	Events []pkg.Event `json:"events"`
+	Events []pkg.EventWithDetails `json:"events"`
 }
 
 func (e EventGateway) EventsHttp(w http.ResponseWriter, r *http.Request) {

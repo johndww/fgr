@@ -48,8 +48,8 @@ basic gift registry
 - [x] display all members & gifts
 - [x] ability to claim and unclaim gifts
 - [x] add/remove your gift requests
-- [ ] event owner controls
-  - [ ] delete event (with confirmation)
+- [x] event owner controls
+  - [x] delete event (with confirmation)
   - [x] update event details (& membership)
 ### TODO
 - [x] Add versioning to endpoints
@@ -61,5 +61,6 @@ basic gift registry
 - [ ] Collate loading and errors on pages that have multiple async sources
 - [x] Restrict firewall on digital ocean (remove postgres)
 - [ ] Prevent multiple clicks doing the same thing
-- [ ] Support invited user getting claimed
+- [x] Support invited user getting claimed
+- [x] Google ad support
 - [ ] Invited user email is not the one they authed with

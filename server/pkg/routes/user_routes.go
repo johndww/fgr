@@ -33,7 +33,7 @@ func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 
 	session, err := u.UserService.GoogleLogin(input.Token)
 	if err != nil {
-		logrus.WithError(err).Error("unable to validate google id token")
+		logrus.WithError(err).Error("unable to google login")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}

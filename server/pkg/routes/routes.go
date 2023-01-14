@@ -7,12 +7,7 @@ import (
 	"server/pkg"
 )
 
-func Define(config pkg.Config) *mux.Router {
-	db, err := pkg.NewDatabase(config)
-	if err != nil {
-		logrus.WithError(err).Fatal("could not create database")
-	}
-
+func Define(config pkg.Config, db *pkg.Database) *mux.Router {
 	baseRouter := mux.NewRouter()
 
 	//baseRouter.Use(mux.CORSMethodMiddleware(baseRouter))
@@ -40,6 +35,7 @@ func Define(config pkg.Config) *mux.Router {
 
 	eventGw := EventGateway{EventService: &pkg.EventService{Database: db}}
 	v1AuthenticatedRouter.HandleFunc("/events/create", eventGw.CreateEventHttp).Methods(http.MethodPost, http.MethodOptions)
+	v1AuthenticatedRouter.HandleFunc("/events/{id}/delete", eventGw.DeleteEventHttp).Methods(http.MethodDelete, http.MethodOptions)
 	v1AuthenticatedRouter.HandleFunc("/events/{id}", eventGw.GetEventHttp).Methods(http.MethodGet, http.MethodOptions, http.MethodOptions)
 	v1AuthenticatedRouter.HandleFunc("/events", eventGw.EventsHttp).Methods(http.MethodGet, http.MethodOptions)
 	v1AuthenticatedRouter.HandleFunc("/events/{id}/update", eventGw.UpdateEventHttp).Methods(http.MethodPost, http.MethodOptions)

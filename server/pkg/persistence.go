@@ -84,7 +84,7 @@ func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
 		return nil, err
 	}
 
-	users := []User{}
+	var users []User
 	for rows.Next() {
 		var id string
 		var name string
@@ -94,6 +94,10 @@ func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
 		err := rows.Scan(&id, &name, &email, &admin)
 		if err != nil {
 			return nil, err
+		}
+
+		if name == "" {
+			name = email
 		}
 
 		users = append(users, User{id, name, email, admin})
@@ -107,24 +111,33 @@ func (d Database) WriteUser(user User) error {
 	return err
 }
 
-func (d Database) WriteExternalUser(user User, mapping UserIdMapping) error {
+func (d Database) WriteExternalUser(user User, mapping UserIdMapping) (*User, error) {
 	txn, err := d.Pool.Begin(context.Background())
 	if err != nil {
-		return errors.Wrap(err, "unable to being txn for write external user")
+		return nil, errors.Wrap(err, "unable to being txn for write external user")
 	}
 	defer txn.Rollback(context.Background())
 
-	_, err = txn.Exec(context.Background(), "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", user.Id, user.Name, user.Email)
+	row := txn.QueryRow(context.Background(), "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)"+
+		" ON CONFLICT (email) DO UPDATE SET name = $4"+
+		" RETURNING id, name", user.Id, user.Name, user.Email, user.Name)
+
+	var id string
+	var name string
+	err = row.Scan(&id, &name)
 	if err != nil {
-		return errors.Wrap(err, "unable to write into users for new external user")
+		return nil, errors.Wrap(err, "unable to scan id of user from writeExternalUser upsert")
 	}
+
+	user.Id = id
+	user.Name = name
 
 	_, err = txn.Exec(context.Background(), "INSERT INTO external_user_ids (user_id, external_id, source) VALUES ($1, $2, $3)", user.Id, mapping.ExternalId, mapping.Source)
 	if err != nil {
-		return errors.Wrap(err, "unable to write userid mapping")
+		return nil, errors.Wrap(err, "unable to write userid mapping")
 	}
 
-	return errors.Wrap(txn.Commit(context.Background()), "unable to commit new external user txn")
+	return &user, errors.Wrap(txn.Commit(context.Background()), "unable to commit new external user txn")
 }
 
 func (d Database) WriteEventAndMembership(event Event, membership Membership) error {
@@ -148,6 +161,35 @@ func (d Database) WriteEventAndMembership(event Event, membership Membership) er
 	return errors.Wrap(txn.Commit(context.Background()), "unable to commit txn")
 }
 
+func (d Database) DeleteEvent(eventId string, userId string) error {
+	txn, err := d.Pool.Begin(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "unable to begin transaction")
+	}
+	defer txn.Rollback(context.Background())
+
+	_, err = txn.Exec(context.Background(), "DELETE FROM memberships WHERE event_id = $1", eventId)
+	if err != nil {
+		return errors.Wrap(err, "unable to delete memberships")
+	}
+
+	_, err = txn.Exec(context.Background(), "DELETE FROM gift_requests WHERE event_id = $1", eventId)
+	if err != nil {
+		return errors.Wrap(err, "unable to delete gift requests")
+	}
+
+	tag, err := txn.Exec(context.Background(), "DELETE FROM events WHERE id = $1 AND owner_user_id = $2", eventId, userId)
+	if err != nil {
+		return errors.Wrap(err, "unable to delete event")
+	}
+
+	if tag.RowsAffected() != 1 {
+		return errors.New("delete event request deleted incorrect number of deleted events: " + strconv.Itoa(int(tag.RowsAffected())))
+	}
+
+	return errors.Wrap(txn.Commit(context.Background()), "unable to commit txn")
+}
+
 func (d Database) ReadEventForUser(eventId string, userId string) (*Event, error) {
 	row := d.Pool.QueryRow(context.Background(), "SELECT id, name, owner_user_id FROM events inner join memberships ON event.id = memberships.event_id inner join users ON membership.user_id = users.id WHERE events.id = $1 AND user.id = $2", eventId, userId)
 
@@ -166,32 +208,49 @@ func (d Database) ReadEventForUser(eventId string, userId string) (*Event, error
 	}, nil
 }
 
-func (d Database) ReadEventsForUser(userId string) ([]Event, error) {
-	rows, err := d.Pool.Query(context.Background(), "SELECT events.id, events.name, events.owner_user_id FROM events INNER JOIN memberships ON events.id = memberships.event_id INNER JOIN users ON memberships.user_id = users.id WHERE users.id = $1", userId)
+func (d Database) ReadEventsForUser(userId string) ([]EventWithDetails, error) {
+	userUUID, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to parse userid to uuid")
+	}
+
+	rows, err := d.Pool.Query(context.Background(),
+		"SELECT events.id, events.name as event_name, events.owner_user_id, users.name as owner_name, subquery.membership_count"+
+			" FROM events"+
+			" INNER JOIN memberships ON events.id = memberships.event_id AND memberships.user_id = $1"+
+			" LEFT JOIN users ON events.owner_user_id = users.id"+
+			" LEFT JOIN (SELECT event_id, COUNT(user_id) as membership_count"+
+			" FROM memberships GROUP BY event_id) AS subquery ON subquery.event_id = events.id", userUUID)
 	if err != nil {
 		logrus.WithError(err).Error("Query failed")
 		return nil, err
 	}
 
-	events := []Event{}
+	var events []EventWithDetails
 	for rows.Next() {
 		var id string
 		var name string
 		var ownerUserId string
+		var ownerName string
+		var membershipCount int
 
-		err := rows.Scan(&id, &name, &ownerUserId)
+		err := rows.Scan(&id, &name, &ownerUserId, &ownerName, &membershipCount)
 		if err != nil {
 			return nil, err
 		}
 
-		events = append(events, Event{id, name, ownerUserId})
+		events = append(events, EventWithDetails{
+			Event:           Event{id, name, ownerUserId},
+			MembershipCount: membershipCount,
+			OwnerName:       ownerName,
+		})
 	}
 
 	return events, rows.Err()
 }
 
 func (d Database) ReadGiftRequestsForEvent(eventId string) ([]GiftRequest, error) {
-	rows, err := d.Pool.Query(context.Background(), "SELECT id, name, user_id, assigned_user_id FROM gift_requests where event_id = $1", eventId)
+	rows, err := d.Pool.Query(context.Background(), "SELECT id, name, description, user_id, assigned_user_id FROM gift_requests where event_id = $1", eventId)
 	if err != nil {
 		logrus.WithError(err).Error("Query failed")
 		return nil, err
@@ -201,10 +260,11 @@ func (d Database) ReadGiftRequestsForEvent(eventId string) ([]GiftRequest, error
 	for rows.Next() {
 		var id string
 		var name string
+		var description *string
 		var userId string
 		var assignedUserId *string
 
-		err := rows.Scan(&id, &name, &userId, &assignedUserId)
+		err := rows.Scan(&id, &name, &description, &userId, &assignedUserId)
 		if err != nil {
 			return nil, err
 		}
@@ -214,6 +274,7 @@ func (d Database) ReadGiftRequestsForEvent(eventId string) ([]GiftRequest, error
 			UserId:         userId,
 			EventId:        eventId,
 			Name:           name,
+			Description:    description,
 			AssignedUserId: assignedUserId,
 		})
 	}
@@ -223,10 +284,10 @@ func (d Database) ReadGiftRequestsForEvent(eventId string) ([]GiftRequest, error
 
 func (d Database) WriteGiftRequestEnsureEventMembership(request GiftRequest) error {
 	_, err := d.Pool.Exec(context.Background(),
-		"INSERT INTO gift_requests (id, user_id, event_id, name, assigned_user_id) "+
-			"SELECT * FROM (VALUES ($1::uuid, $2::uuid, $3::uuid, $4, $5::uuid)) i(id, user_id, event_id, name, assigned_user_id) "+
+		"INSERT INTO gift_requests (id, user_id, event_id, name, description, assigned_user_id) "+
+			"SELECT * FROM (VALUES ($1::uuid, $2::uuid, $3::uuid, $4, $5, $6::uuid)) i(id, user_id, event_id, name, description, assigned_user_id) "+
 			"WHERE EXISTS ( SELECT FROM memberships WHERE i.user_id = memberships.user_id AND i.event_id = memberships.event_id )",
-		request.Id, request.UserId, request.EventId, request.Name, request.AssignedUserId)
+		request.Id, request.UserId, request.EventId, request.Name, request.Description, request.AssignedUserId)
 	return err
 }
 
@@ -362,7 +423,7 @@ func (d Database) UpdateEvent(eventId string, userId string, name string, member
 		if userId == nil {
 			newUser := User{
 				Id:    uuid.New().String(),
-				Name:  *inputEmail,
+				Name:  "",
 				Email: *inputEmail,
 			}
 			usersToInvite = append(usersToInvite, newUser)
@@ -469,7 +530,7 @@ func (d Database) ReadSession(id string) (*Session, error) {
 	}, nil
 }
 
-func (d Database) CreateSessionAndDeactivateOld(userId string) (*Session, error) {
+func (d Database) CreateSession(userId string) (*Session, error) {
 	txn, err := d.Pool.Begin(context.Background())
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to begin txn")
@@ -497,6 +558,14 @@ func (d Database) CreateSessionAndDeactivateOld(userId string) (*Session, error)
 		return nil, errors.Wrap(err, "unable to commit txn for creating a session")
 	}
 	return &session, nil
+}
+
+func (d Database) UpdateUserName(userId string, name string) error {
+	_, err := d.Pool.Exec(context.Background(), "UPDATE users SET name = $1 WHERE id = $2", name, userId)
+	if err != nil {
+		return errors.Wrap(err, "unable to update user name")
+	}
+	return nil
 }
 
 func noRowsFoundError(err error) bool {

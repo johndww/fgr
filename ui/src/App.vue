@@ -35,6 +35,8 @@ export interface Event {
   id: string,
   name: string,
   ownerUserId: string
+  ownerName: string
+  membershipCount: number
 }
 
 export interface GiftRequest {
@@ -42,6 +44,7 @@ export interface GiftRequest {
   userId: string,
   eventId: string,
   name: string
+  description: string,
   isAssigned: boolean
   isAssignedToMe: boolean
 }
