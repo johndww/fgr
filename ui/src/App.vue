@@ -7,7 +7,7 @@
       </div>
       <div v-show="currentUserState.data" class="logged-in-user">
         <img src="@/assets/user_icons/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
-        <a @click="logout" class="user">{{ currentUserState.data != null && currentUserState.data.name }}</a>
+        <span class="user" v-if="currentUserState.data != null">{{ currentUserState.data.name }} - <a @click="logout" class="logout">Logout</a> </span>
         <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser"
            class="admin">Admin</a>
       </div>
@@ -252,6 +252,10 @@ h2 {
   color: #89BF60;
   text-transform: uppercase;
   background: none;
+  cursor: pointer;
+}
+
+.logout {
   cursor: pointer;
 }
 

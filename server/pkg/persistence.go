@@ -51,6 +51,10 @@ func (d Database) ReadUsers() ([]User, error) {
 			return nil, err
 		}
 
+		if name == "" {
+			name = email
+		}
+
 		users = append(users, User{id, name, email, admin})
 	}
 
@@ -67,6 +71,10 @@ func (d Database) ReadUser(id string) (*User, error) {
 			return nil, nil
 		}
 		return nil, errors.Wrap(err, "unable to read user")
+	}
+
+	if name == "" {
+		name = email
 	}
 
 	return &User{
