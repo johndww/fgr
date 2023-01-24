@@ -99,8 +99,6 @@ export function login(userId: string): Promise<any> {
 }
 
 export function loginGoogle(credential: string): Promise<any> {
-    console.log("backendUrl: " + backendV1Url)
-    console.log("backend base url: " + backendBaseUrl)
     return axios.post(backendV1Url + '/login/google', {
         token: credential
     }, {
@@ -120,6 +118,28 @@ export function loginGoogle(credential: string): Promise<any> {
         })
         .catch(err => {
             console.log("unable to login with google: " + err)
+            return Promise.reject(err)
+        })
+}
+
+export function loginDemoUser(): Promise<any> {
+    return axios.post(backendV1Url + '/login/demo', {}, {
+        withCredentials: true
+    })
+        .then(() => {
+            return fetchCSRFToken()
+                .then(() => {
+                    return fetchCurrentUser().catch((err) => {
+                        console.log("unable to fetch user after logging in as demo: " + err.message)
+                        return Promise.reject(err)
+                    })
+                }).catch((err) => {
+                    console.log("unable to fetch CSRF token immediately after logging in. will try again: " + err.message)
+                    return Promise.resolve()
+                })
+        })
+        .catch(err => {
+            console.log("unable to login with demo user: " + err)
             return Promise.reject(err)
         })
 }

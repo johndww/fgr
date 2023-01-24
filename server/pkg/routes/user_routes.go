@@ -21,6 +21,19 @@ func (u UserGateway) DevAdminLogin(w http.ResponseWriter, r *http.Request) {
 	u.AdminLoginHttp(w, r)
 }
 
+func (u UserGateway) LoginDemoHttp(w http.ResponseWriter, r *http.Request) {
+	session, err := u.UserService.DemoLogin()
+	if err != nil {
+		logrus.WithError(err).Error("unable to demo login")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	u.setCookie(w, session.Id)
+
+	logrus.WithField("userId", session.UserId).Info("logged user in with google")
+}
+
 func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 	input := googleToken{}
 	err := ReadBody(r.Body, &input)

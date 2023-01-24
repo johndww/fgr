@@ -33,6 +33,7 @@ func (u UserService) CreateUser(name string) (string, error) {
 		Name:  name,
 		Email: name + "@Email.com",
 		Admin: false,
+		Demo:  false,
 	}
 
 	err := u.Database.WriteUser(user)
@@ -124,6 +125,10 @@ func (u UserService) GetCsrf(sessionId string) (string, error) {
 	return session.CsrfToken, nil
 }
 
+func (u UserService) DemoLogin() (*Session, error) {
+	return u.Database.CreateSession(DemoUserId1)
+}
+
 type UserIdMapping struct {
 	UserId     string
 	ExternalId string
@@ -135,4 +140,5 @@ type User struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Admin bool   `json:"admin"`
+	Demo  bool   `json:"demo"`
 }

@@ -70,6 +70,18 @@
       </div>
       <router-link class="edit" :to="{name: 'editevent', params: { id: event.id }}"><button class="button">Edit Event</button></router-link>
     </div>
+
+    <div>
+      <div>
+        <!-- footer -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3785547202124831"
+             data-ad-slot="4497174860"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
+    </div>
   </div>
 
 </template>

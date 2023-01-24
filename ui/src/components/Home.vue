@@ -3,6 +3,9 @@
     <h1 class="welcome-header">Welcome</h1>
     <p class="welcome-message"><b>SimpleGift</b> is a simple app that lets friends and families organize gifting for
       holidays like Christmas, without duplicating gifts to anyone or spoiling the gift surprise.</p>
+    <p>
+      To demo the app, <a @click="loginDemo">Click Here</a>
+    </p>
     <div>
       <GoogleLogin :callback="gCallback"/>
     </div>
@@ -12,9 +15,9 @@
 
 <script lang="ts">
 
-import {defineComponent} from "vue";
+import {defineComponent, ref} from "vue";
 import {useRouter} from "vue-router";
-import {loginGoogle} from "../state/users";
+import {loginDemoUser, loginGoogle} from "../state/users";
 
 export default defineComponent({
   name: "Home",
@@ -36,9 +39,19 @@ export default defineComponent({
           })
     }
 
+    const loginDemo = function () {
+      loginDemoUser()
+          .then(() => {
+            router.push({
+              name: "selectevent"
+            })
+          })
+    }
+
     return {
       selectUser,
-      gCallback
+      gCallback,
+      loginDemo
     }
   }
 })

@@ -7,7 +7,7 @@
       </div>
       <div v-show="currentUserState.data" class="logged-in-user">
         <img src="@/assets/user_icons/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
-        <span class="user" v-if="currentUserState.data != null">{{ currentUserState.data.name }} - <a @click="logout" class="logout">Logout</a> </span>
+        <span class="user" v-if="currentUserState.data != null">{{ currentUserState.data.name }} <span style="font-weight: bold" v-if="currentUserState.data.demo">(DEMO - NO CHANGES)</span> - <a @click="logout" class="logout">Logout</a> </span>
         <a v-if="currentUserState.data != null && currentUserState.data.admin" @click="selectUser"
            class="admin">Admin</a>
       </div>
@@ -29,6 +29,7 @@ export interface User {
   name: string,
   email: string,
   admin: boolean,
+  demo: boolean
 }
 
 export interface Event {
@@ -89,6 +90,17 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+a {
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #269e62
 }
 
 h1 {

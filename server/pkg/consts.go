@@ -1,0 +1,16 @@
+package pkg
+
+const DemoUserId1 = "a4da0b60-0248-47fa-be1a-855ebbbe99f8"
+const DemoUserId2 = "036fcfbb-fba2-4110-a865-9461296218f2"
+const DemoUserId3 = "2fde558a-f9c0-42ec-9bb5-be57484e44b7"
+const DemoEventId1 = "11e5b60d-286d-4379-a9df-173d19c05430"
+const DemoEventId2 = "c2d931b2-d7b9-43e9-8b79-16a9fb627dca"
+const DemoMembershipEvent1User1 = "5da04721-97d9-4942-a388-6dcc97f1858d"
+const DemoMembershipEvent1User2 = "31a47064-06d9-437d-b69b-9b00bf378f88"
+const DemoMembershipEvent2User1 = "5c5827d1-9121-41ad-ba1f-51a88b8f5e79"
+const DemoMembershipEvent2User3 = "ab53facd-bf7a-4903-92dd-bccaeea31483"
+const DemoGiftRequestEvent1Id1 = "43bde388-5b6f-42e9-a001-fcf7efdc70a7"
+const DemoGiftRequestEvent1Id2 = "0fc74f2e-067b-4b24-b14a-48f8d1b2cab9"
+const DemoGiftRequestEvent1Id3 = "c11dfe8e-7d77-40ec-bd5c-806e40fc08d8"
+const DemoGiftRequestEvent2Id1 = "77547250-727a-4efb-bedb-28b343cae0bc"
+const DemoGiftRequestEvent2Id2 = "5f44b518-0267-4c85-959f-6d68832ba33d"

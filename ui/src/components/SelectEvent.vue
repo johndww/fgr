@@ -44,6 +44,16 @@
         <button type="submit" class="submit-button">Create new event</button>
       </form>
     </div>
+
+    <div>
+      <!-- footer -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3785547202124831"
+           data-ad-slot="4497174860"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
   </div>
 
 </template>

@@ -10,7 +10,6 @@ import (
 func Define(config pkg.Config, db *pkg.Database) *mux.Router {
 	baseRouter := mux.NewRouter()
 
-	//baseRouter.Use(mux.CORSMethodMiddleware(baseRouter))
 	baseRouter.Use(pkg.CORSOriginMiddleware{Config: config}.Middleware)
 	baseRouter.Use(pkg.RequestMiddleware{}.Middleware)
 
@@ -20,6 +19,7 @@ func Define(config pkg.Config, db *pkg.Database) *mux.Router {
 	v1UnauthenticatedRouterRouter := apiRouter.PathPrefix("/v1").Subrouter()
 
 	v1UnauthenticatedRouterRouter.HandleFunc("/login/google", userGw.LoginGoogleHttp).Methods(http.MethodPost, http.MethodOptions)
+	v1UnauthenticatedRouterRouter.HandleFunc("/login/demo", userGw.LoginDemoHttp).Methods(http.MethodPost, http.MethodOptions)
 	if config.Behavior == "dev" {
 		logrus.Info("dev login route added")
 		v1UnauthenticatedRouterRouter.HandleFunc("/devadmin/login/{id}", userGw.DevAdminLogin).Methods(http.MethodGet, http.MethodOptions)
@@ -27,6 +27,7 @@ func Define(config pkg.Config, db *pkg.Database) *mux.Router {
 
 	v1AuthenticatedRouter := apiRouter.PathPrefix("/v1").Subrouter()
 	v1AuthenticatedRouter.Use(pkg.SessionMiddleware{Database: db}.Middleware)
+	v1AuthenticatedRouter.Use(pkg.DemoUserMiddleware{}.Middleware)
 
 	v1AuthenticatedRouter.HandleFunc("/csrf", userGw.Csrf).Methods(http.MethodGet, http.MethodOptions)
 	v1AuthenticatedRouter.HandleFunc("/logout", userGw.LogoutHttp).Methods(http.MethodPost, http.MethodOptions)

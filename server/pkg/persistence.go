@@ -33,7 +33,7 @@ type Database struct {
 }
 
 func (d Database) ReadUsers() ([]User, error) {
-	rows, err := d.Pool.Query(context.Background(), "select id, name, email, admin from users")
+	rows, err := d.Pool.Query(context.Background(), "select id, name, email, admin, demo from users")
 	if err != nil {
 		logrus.WithError(err).Error("Query failed")
 		return nil, err
@@ -45,8 +45,9 @@ func (d Database) ReadUsers() ([]User, error) {
 		var name string
 		var email string
 		var admin bool
+		var demo bool
 
-		err := rows.Scan(&id, &name, &email, &admin)
+		err := rows.Scan(&id, &name, &email, &admin, &demo)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +56,7 @@ func (d Database) ReadUsers() ([]User, error) {
 			name = email
 		}
 
-		users = append(users, User{id, name, email, admin})
+		users = append(users, User{id, name, email, admin, demo})
 	}
 
 	return users, rows.Err()
@@ -65,7 +66,8 @@ func (d Database) ReadUser(id string) (*User, error) {
 	var name string
 	var email string
 	var admin bool
-	err := d.Pool.QueryRow(context.Background(), "select name, email, admin from users where id = $1", id).Scan(&name, &email, &admin)
+	var demo bool
+	err := d.Pool.QueryRow(context.Background(), "select name, email, admin, demo from users where id = $1", id).Scan(&name, &email, &admin, &demo)
 	if err != nil {
 		if noRowsFoundError(err) {
 			return nil, nil
@@ -82,6 +84,7 @@ func (d Database) ReadUser(id string) (*User, error) {
 		Name:  name,
 		Email: email,
 		Admin: admin,
+		Demo:  demo,
 	}, nil
 }
 
@@ -108,14 +111,14 @@ func (d Database) ReadUsersForEvent(eventId string) ([]User, error) {
 			name = email
 		}
 
-		users = append(users, User{id, name, email, admin})
+		users = append(users, User{id, name, email, admin, false})
 	}
 
 	return users, rows.Err()
 }
 
 func (d Database) WriteUser(user User) error {
-	_, err := d.Pool.Exec(context.Background(), "INSERT INTO users (id, name, email, admin) VALUES ($1, $2, $3, $4)", user.Id, user.Name, user.Email, user.Admin)
+	_, err := d.Pool.Exec(context.Background(), "INSERT INTO users (id, name, email, admin, demo) VALUES ($1, $2, $3, $4, $5)", user.Id, user.Name, user.Email, user.Admin, user.Demo)
 	return err
 }
 

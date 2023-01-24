@@ -58,7 +58,7 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 
 		user, err := s.Database.ReadUser(session.UserId)
 		if err != nil {
-			logrus.WithError(err).Error("unable to read user")
+			logrus.WithError(err).Error("unable to read user for session middleware")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
