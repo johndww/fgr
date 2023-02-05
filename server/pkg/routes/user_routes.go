@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var oneMonth = time.Now().Add(30 * 24 * time.Hour)
+
 type UserGateway struct {
 	UserService *pkg.UserService
 	Config      pkg.Config
@@ -29,7 +31,7 @@ func (u UserGateway) LoginDemoHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id)
+	u.setCookie(w, session.Id, oneMonth)
 
 	logrus.WithField("userId", session.UserId).Info("logged user in with google")
 }
@@ -51,7 +53,7 @@ func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id)
+	u.setCookie(w, session.Id, oneMonth)
 
 	logrus.WithField("userId", session.UserId).Info("logged user in with google")
 }
@@ -67,41 +69,36 @@ func (u UserGateway) AdminLoginHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id)
+	u.setCookie(w, session.Id, oneMonth)
 
 	logrus.WithField("userId", userId).Info("logged admin user in")
 }
 
-func (u UserGateway) setCookie(w http.ResponseWriter, userId string) {
+func (u UserGateway) setCookie(w http.ResponseWriter, sessionId string, expires time.Time) {
 	sessionIdCookie := http.Cookie{
-		Name:   pkg.SessionCookieName,
-		Value:  userId,
-		Path:   "/",
-		MaxAge: 30 * 24 * 60 * 60, // one month
+		Name:    pkg.SessionCookieName,
+		Value:   sessionId,
+		Path:    "/",
+		Expires: expires,
+		//MaxAge:  30 * 24 * 60 * 60, // one month
 		Secure: u.Config.Behavior == "prod",
 	}
 	http.SetCookie(w, &sessionIdCookie)
 }
 
 func (u UserGateway) LogoutHttp(w http.ResponseWriter, r *http.Request) {
-	userId, err := pkg.UserIdFromContext(r.Context())
+	cookie, err := r.Cookie(pkg.SessionCookieName)
 	if err != nil {
-		logrus.WithError(err).Error("unable to pull userid from context")
-		w.WriteHeader(http.StatusInternalServerError)
+		logrus.WithError(err).WithField("route", r.URL.Path).Warn("unable to read session cookie")
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
-	sessionIdCookie := http.Cookie{
-		Name:    pkg.SessionCookieName,
-		Value:   "",
-		Path:    "/",
-		Expires: time.Now(),
-		MaxAge:  0,
-		Secure:  u.Config.Behavior == "prod",
-	}
-	http.SetCookie(w, &sessionIdCookie)
+	sessionId := cookie.Value
 
-	logrus.WithField("userId", userId).Info("logged user out")
+	u.setCookie(w, sessionId, time.Now().Add(-7*24*time.Hour))
+
+	logrus.WithField("sessionId", sessionId).Info("logged user out")
 }
 
 func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {

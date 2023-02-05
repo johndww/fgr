@@ -24,6 +24,7 @@ var demoUserApis = []string{
 	"/api/v1/events/{id}",
 	"/api/v1/events",
 	"/api/v1/events/{eventId}/gift-requests",
+	"/api/v1/logout",
 }
 
 type DemoUserMiddleware struct {
