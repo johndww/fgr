@@ -33,7 +33,7 @@ func (u UserGateway) LoginDemoHttp(w http.ResponseWriter, r *http.Request) {
 
 	u.setCookie(w, session.Id, oneMonth)
 
-	logrus.WithField("userId", session.UserId).Info("logged user in with google")
+	logrus.WithField("userId", session.UserId).Info("logged user in with demo")
 }
 
 func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {

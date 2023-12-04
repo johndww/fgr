@@ -32,6 +32,18 @@ type DemoUserMiddleware struct {
 
 func (s DemoUserMiddleware) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId, err := UserIdFromContext(r.Context())
+		if err != nil {
+			logrus.WithError(err).Error("unable to pull userid from context")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if userId != DemoUserId1 {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		path, err := mux.CurrentRoute(r).GetPathTemplate()
 		if err != nil {
 			logrus.WithError(err).Error("unable to get path template")

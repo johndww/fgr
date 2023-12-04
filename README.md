@@ -15,12 +15,45 @@ basic gift registry
 - npm install
 - vite (or vite build for prod)
 
-### Setup Backend
+### SSL (yearly renewal)
+- Namecheap SSL
+- Create new CSR in Droplet (SSH in, ~/certs using openssl from https://www.namecheap.com/support/knowledgebase/article.aspx/9446/2290/generating-csr-on-apache-opensslmodsslnginx-heroku/)
+- Use CSR in Namecheap website for PositiveSSL manage
+- Use CNAME verification - add CNAME in Digital Ocean UI and validate in Namecheap
+- Cert issued to email (.crt and .bundle)
+- Follow Cert install instructions for NGINX https://www.sectigo.com/knowledge-base/detail/Certificate-Installation-NGINX-1527076083655/kA01N000000zFJQ
+- Use these locations (replace old): ```    ssl_certificate /home/fgr/certs/simplegift_app.chained.crt;
+    ssl_certificate_key /home/fgr/certs/simplegift_app.key;```
+- Reboot FGR (pulls new private key): ``` sudo systemctl restart fgr```
+- Reboot nginx (pulls new chained cert): ```sudo systemctl restart nginx```
+
+### Server Configuration / Operation
+- nginx config: ```/etc/nginx/sites-enabled/```
+- view server logs: ``` sudo journalctl -u fgr```
+- start/stop app: ``` sudo systemctl stop fgr
+   sudo systemctl start fgr```
+- verify startup ```sudo systemctl status fgr```
+- Update UI:
+- - upload UI assets
+- - ```./uiReplace.sh```
+
+### Setup Backend (Local)
 - create a .env.local file and fill out the fields based off of .env
 - install https://magefile.org/ (brew install mage)
 - cd server
 - go mod vendor
 - go run main.go
+
+### Update Backend on Server
+- ```~/code/fgr/server```
+- ```BEHAVIOR=prod mage -v build```
+- ```cd build```
+- ``` sftp fgr@164.92.73.41```
+- ```put fgr```
+- on server in ~: ```mv fgr build```
+- ```sudo systemctl stop fgr```
+- ```sudo systemctl start fgr```
+- verify: ```sudo systemctl status fgr```
 
 ## Pages
 
