@@ -14,6 +14,15 @@ basic gift registry
 - cd ui
 - npm install
 - vite (or vite build for prod)
+  - for dev login, ```/devlogin``` with ```e36afe1d-ef84-42a8-af38-0e6d60745e9e```
+
+### Setup Backend (Local)
+- create a .env.local file and fill out the fields based off of .env
+- install https://magefile.org/ (brew install mage)
+- cd server
+- go mod vendor
+- (ensure DB is running - postgres in Docker)
+- go run main.go
 
 ### SSL (yearly renewal)
 - Namecheap SSL
@@ -36,13 +45,6 @@ basic gift registry
 - Update UI:
 - - upload UI assets
 - - ```./uiReplace.sh```
-
-### Setup Backend (Local)
-- create a .env.local file and fill out the fields based off of .env
-- install https://magefile.org/ (brew install mage)
-- cd server
-- go mod vendor
-- go run main.go
 
 ### Update Backend on Server
 - ```~/code/fgr/server```

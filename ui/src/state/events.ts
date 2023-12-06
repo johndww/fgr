@@ -141,10 +141,13 @@ export function persistDeleteEvent(eventId: string, state: Ref<DeleteEventState>
         .finally(() => state.value.loading = false)
 }
 
-export interface ReleaseGiftRequestState extends State<string>{}
+export interface ReleaseGiftRequestState extends State<string>{
+    giftId: string
+}
 
 export function persistReleaseGift(eventId: string, giftId: string, state: Ref<ReleaseGiftRequestState>) {
     state.value.loading = true
+    state.value.giftId = giftId
 
     return axios.post(backendV1Url + "/events/" + eventId + "/gift-requests/" + giftId + "/release", {}, {
         withCredentials: true
@@ -157,13 +160,20 @@ export function persistReleaseGift(eventId: string, giftId: string, state: Ref<R
             state.value.error = "Unable to release gift request"
             return Promise.reject(err)
         })
-        .finally(() => state.value.loading = false)
+        .finally(() => {
+                state.value.loading = false
+                state.value.giftId = ""
+            }
+        )
 }
 
-export interface ClaimGiftRequestState extends State<string>{}
+export interface ClaimGiftRequestState extends State<string>{
+    giftId: string
+}
 
 export function persistClaimGift(eventId: string, giftId: string, byUserId: string, state: Ref<ClaimGiftRequestState>) {
     state.value.loading = true
+    state.value.giftId = giftId
 
     return axios.post(backendV1Url + "/events/" + eventId + "/gift-requests/" + giftId + "/claim", {}, {
         withCredentials: true
@@ -176,7 +186,10 @@ export function persistClaimGift(eventId: string, giftId: string, byUserId: stri
             state.value.error = "Unable to claim gift request"
             return Promise.reject(err)
         })
-        .finally(() => state.value.loading = false)
+        .finally(() => {
+            state.value.loading = false
+            state.value.giftId = ""
+        })
 }
 
 export interface UpdateEventState extends State<string>{}

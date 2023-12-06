@@ -46,7 +46,10 @@
       <div class="item-container" v-for="gift in unassignedGifts" :key="gift.name">
         <div class="item-claim">
           <div class="item-name">{{ gift.name }}</div>
-          <button class="button" @click="assignGift(gift.id, currentUserId)">Claim Gift</button>
+          <button class="button" @click="assignGift(gift.id, currentUserId)" :disabled="this.claimGiftState.loading">
+            <span v-if="this.claimGiftState.loading && this.claimGiftState.giftId === gift.id">Claiming...</span>
+            <span v-if="!this.claimGiftState.loading || this.claimGiftState.giftId !== gift.id">Claim Gift</span>
+          </button>
         </div>
         <div class="gift-description">{{ gift.description }}</div>
       </div>
@@ -55,7 +58,10 @@
         <div class="item-release">
           <div class="item-name">{{ gift.name }}</div>
           <template v-if="gift.isAssignedToMe">
-            <button class="release-gift-button" @click="releaseGift(gift.id)">Release Gift</button>
+            <button class="release-gift-button" @click="releaseGift(gift.id)" :disabled="this.releaseGiftState.loading">
+              <span v-if="this.releaseGiftState.loading && this.releaseGiftState.giftId === gift.id">Releasing...</span>
+              <span v-if="!this.releaseGiftState.loading || this.releaseGiftState.giftId !== gift.id">Release Gift</span>
+            </button>
           </template>
         </div>
         <div class="gift-description">{{ gift.description }}</div>
@@ -155,7 +161,7 @@ export default {
     }
 
     //TODO errors from these should get collated and displayed. need to rethink loading or error
-    const claimGiftState = ref({data: "", loading: false, error: ""})
+    const claimGiftState = ref({data: "", loading: false, giftId: "", error: ""})
     const claimGift = function(giftId: string, byUserId: string) {
       persistClaimGift(eventId, giftId, byUserId, claimGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
@@ -170,7 +176,7 @@ export default {
       persistDeleteGiftRequest(eventId, giftId, deleteGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
 
-    const releaseGiftState = ref({data: "", loading: false, error: ""})
+    const releaseGiftState = ref({data: "", loading: false, giftId: "", error: ""})
     const releaseGift = function(giftId: string) {
       persistReleaseGift(eventId, giftId, releaseGiftState).finally(() => getGiftRequests(eventId, giftRequestState))
     }
@@ -201,7 +207,9 @@ export default {
       unassignedGifts,
       assignedGifts,
       giftRequestState,
-      userIcon
+      userIcon,
+      releaseGiftState,
+      claimGiftState
     }
   },
 }
