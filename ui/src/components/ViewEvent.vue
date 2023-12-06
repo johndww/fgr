@@ -232,6 +232,12 @@ export default {
   margin-right: 91px;
 }
 
+@media (max-width: 600px) {
+  .event-members {
+    margin-left: 10px;
+  }
+}
+
 .member {
   height: 48px;
   padding-left: 11px;
@@ -296,6 +302,12 @@ export default {
   flex-direction: column;
   row-gap: 15px;
   margin: 20px 91px 30px;
+}
+
+@media (max-width: 600px) {
+  .items {
+    margin-left: 10px;
+  }
 }
 
 .item-container{

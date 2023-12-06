@@ -123,7 +123,6 @@ h2 {
 }
 
 .header {
-  height: 77px;
   width: 100%;
   background: #FBFDFF 0% 0% no-repeat padding-box;
   border-radius: 10px 10px 0px 0px;
@@ -131,6 +130,7 @@ h2 {
   line-height: 77px;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .logo {
@@ -138,6 +138,12 @@ h2 {
   vertical-align: middle;
   margin-right: 8px;
   margin-left: 25px;
+}
+
+@media (max-width: 600px) {
+  .logo {
+    margin-left: 0px;
+  }
 }
 
 .header-name {
@@ -156,6 +162,7 @@ h2 {
 .logged-in-user {
   display: inline-block;
   vertical-align: middle;
+  margin-left: 10px;
 }
 
 .user {
@@ -197,6 +204,12 @@ h2 {
 .view-event-title {
   margin-left: 91px;
   padding-top: 26px;
+}
+
+@media (max-width: 600px) {
+  .view-event-title {
+    margin-left: 10px;
+  }
 }
 
 .event-header-title-back {

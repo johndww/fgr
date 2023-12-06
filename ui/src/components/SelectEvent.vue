@@ -125,6 +125,12 @@ export default {
   align-items: center;
 }
 
+@media (max-width: 600px) {
+  .add-events {
+    margin-left: 10px;
+  }
+}
+
 .add-event-circle {
   border: 3px solid #89BF60;
   width:31px;
@@ -161,6 +167,16 @@ export default {
   margin: 38px 91px 30px;
 }
 
+@media (max-width: 600px) {
+  .pick-event-container {
+    margin-left: 10px;
+  }
+}
+
+.event-member-count {
+  margin-left: 5px;
+}
+
 .title-and-date {
   display: flex;
   justify-content: space-between;
@@ -192,8 +208,7 @@ select {
 }
 
 .event-container {
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 10px 20px;
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #70707040;
   border-radius: 10px;
@@ -202,6 +217,7 @@ select {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+  min-width: 230px;
 }
 
 .event-name {

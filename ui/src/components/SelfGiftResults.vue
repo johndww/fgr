@@ -86,6 +86,12 @@ export default defineComponent({
   margin: 20px 91px 30px;
 }
 
+@media (max-width: 600px) {
+  .items {
+    margin-left: 10px;
+  }
+}
+
 .item-container{
   min-height: 79px;
   padding-top: 15px;
@@ -128,6 +134,12 @@ export default defineComponent({
   flex-direction: column;
   margin: 20px 91px 30px;
   row-gap: 15px;
+}
+
+@media (max-width: 600px) {
+  .create-gift {
+    margin-left: 10px;
+  }
 }
 
 .create-gift-name {
