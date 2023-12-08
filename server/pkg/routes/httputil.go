@@ -2,16 +2,25 @@ package routes
 
 import (
 	"encoding/json"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
 )
 
+var p *bluemonday.Policy
+
+func init() {
+	p = bluemonday.UGCPolicy()
+}
+
 func ReadBody(body io.ReadCloser, output any) error {
-	bytes, err := io.ReadAll(body)
+	unsafeBytes, err := io.ReadAll(body)
 	if err != nil {
 		return errors.Wrap(err, "unable to read bytes")
 	}
+
+	bytes := p.SanitizeBytes(unsafeBytes)
 
 	err = json.Unmarshal(bytes, output)
 	if err != nil {

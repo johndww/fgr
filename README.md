@@ -95,7 +95,7 @@ basic gift registry
 - [x] HTTPS and secure cookie
 - [ ] Collate loading and errors on pages that have multiple async sources
 - [x] Restrict firewall on digital ocean (remove postgres)
-- [ ] Prevent multiple clicks doing the same thing
+- [x] Prevent multiple clicks doing the same thing (gift claim/release)
 - [x] Support invited user getting claimed
 - [x] Google ad support
 - [ ] Invited user email is not the one they authed with
