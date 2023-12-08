@@ -15,17 +15,18 @@ func init() {
 }
 
 func ReadBody(body io.ReadCloser, output any) error {
-	unsafeBytes, err := io.ReadAll(body)
+	bytes, err := io.ReadAll(body)
 	if err != nil {
 		return errors.Wrap(err, "unable to read bytes")
 	}
-
-	bytes := p.SanitizeBytes(unsafeBytes)
 
 	err = json.Unmarshal(bytes, output)
 	if err != nil {
 		return errors.Wrap(err, "unable to unmarshal json")
 	}
+
+	SanitizeFields(output)
+
 	return nil
 }
 

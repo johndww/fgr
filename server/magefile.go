@@ -12,6 +12,8 @@ import (
 
 // Runs go mod download and then installs the binary.
 func Build() error {
+	mg.Deps(Test)
+	
 	err := buildServer()
 	if err != nil {
 		logrus.WithError(err).Fatal("unable to build server")
@@ -38,6 +40,10 @@ func Deploy() error {
 		logrus.WithError(err).Fatal("unable to deploy server")
 	}
 	return nil
+}
+
+func Test() error {
+	return sh.RunV("go", "test", "./...")
 }
 
 func deployServer() error {
