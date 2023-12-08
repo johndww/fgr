@@ -1,9 +1,11 @@
 <template>
   <div class="main-container">
     <div class="header">
-      <div>
-        <img src="./assets/logo.svg" alt="SimpleGiftApp" width="35" height="35" class="logo">
-        <div class="header-name">SimpleGift</div>
+      <div class="logo-title">
+        <router-link :to="{name: 'selectevent'}">
+          <img src="./assets/logo.svg" alt="SimpleGiftApp" width="35" height="35" class="logo">
+          <div class="header-name">SimpleGift</div>
+        </router-link>
       </div>
       <div v-show="currentUserState.data" class="logged-in-user">
         <img src="@/assets/user_icons/user_icon_blue.svg" alt="UserIcon" width="24" height="24" class="user-icon">
@@ -137,6 +139,9 @@ h2 {
   display: inline-block;
   vertical-align: middle;
   margin-right: 8px;
+}
+
+.logo-title {
   margin-left: 25px;
 }
 
