@@ -51,7 +51,13 @@
             <span v-if="!this.claimGiftState.loading || this.claimGiftState.giftId !== gift.id">Claim Gift</span>
           </button>
         </div>
-        <div class="gift-description">{{ gift.description }}</div>
+        <div class="gift-description">
+           <span v-for="(item, index) in processDescription(gift.description)" :key="index">
+             <template v-if="item.type === 'text'">{{ item.content }}</template>
+             <a v-else-if="item.type === 'link'" :href="item.href" target="_blank">{{ item.content }}</a>
+           </span>
+          <!--          {{ gift.description }}-->
+        </div>
       </div>
 
       <div class="item-container" v-for="gift in assignedGifts" :key="gift.name">
@@ -64,7 +70,14 @@
             </button>
           </template>
         </div>
-        <div class="gift-description">{{ gift.description }}</div>
+        <div class="gift-description">
+          <span v-for="(item, index) in processDescription(gift.description)" :key="index">
+             <template v-if="item.type === 'text'">{{ item.content }}</template>
+             <a v-else-if="item.type === 'link'" :href="item.href" target="_blank">{{ item.content }}</a>
+            TEST
+           </span>
+<!--          {{ gift.description }}-->
+        </div>
       </div>
 
     </div>
@@ -108,6 +121,7 @@ import {
 import LoadingOrError from "./LoadingOrError.vue";
 import {GiftRequest} from "../App.vue";
 import SelfGiftResults from "./SelfGiftResults.vue";
+import HttpUtil from "@/util/HttpUtil";
 
 export default {
   components: {LoadingOrError, SelfGiftResults},
@@ -193,6 +207,8 @@ export default {
       return new URL(`/src/assets/user_icons/${icons[iconIdx]}`, import.meta.url).href
     }
 
+    const processDescription = HttpUtil.parseUrlAndContent
+
     return {
       viewResultsUserId,
       event,
@@ -209,7 +225,8 @@ export default {
       giftRequestState,
       userIcon,
       releaseGiftState,
-      claimGiftState
+      claimGiftState,
+      processDescription
     }
   },
 }

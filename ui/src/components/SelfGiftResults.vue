@@ -6,7 +6,13 @@
         <div class="item-name">{{ gift.name }}</div>
         <button class="delete-gift-button" @click="deleteGift(gift.id)">Delete Gift</button>
       </div>
-      <div class="gift-description">{{gift.description}}</div>
+      <div class="gift-description">
+        <span v-for="(item, index) in processDescription(gift.description)" :key="index">
+             <template v-if="item.type === 'text'">{{ item.content }}</template>
+             <a v-else-if="item.type === 'link'" :href="item.href" target="_blank">{{ item.content }}</a>
+           </span>
+<!--        {{gift.description}}-->
+      </div>
     </div>
   </div>
 
@@ -27,6 +33,7 @@
 import {useCurrentUserId} from "../state/users";
 import {GetGiftRequestsState} from "../state/events";
 import {computed, defineComponent, ref} from "vue";
+import HttpUtil from "@/util/HttpUtil";
 
 export default defineComponent({
   props: ['eventId', 'giftRequestState'],
@@ -65,12 +72,15 @@ export default defineComponent({
       emit('delete-gift', giftIdToDelete)
     }
 
+    const processDescription = HttpUtil.parseUrlAndContent
+
     return {
       giftToAdd,
       description,
       myGifts,
       addGift,
-      deleteGift
+      deleteGift,
+      processDescription
     }
   }
 })
