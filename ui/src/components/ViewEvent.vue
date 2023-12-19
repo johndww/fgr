@@ -56,7 +56,6 @@
              <template v-if="item.type === 'text'">{{ item.content }}</template>
              <a v-else-if="item.type === 'link'" :href="item.href" target="_blank">{{ item.content }}</a>
            </span>
-          <!--          {{ gift.description }}-->
         </div>
       </div>
 
@@ -74,9 +73,7 @@
           <span v-for="(item, index) in processDescription(gift.description)" :key="index">
              <template v-if="item.type === 'text'">{{ item.content }}</template>
              <a v-else-if="item.type === 'link'" :href="item.href" target="_blank">{{ item.content }}</a>
-            TEST
            </span>
-<!--          {{ gift.description }}-->
         </div>
       </div>
 

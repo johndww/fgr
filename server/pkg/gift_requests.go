@@ -35,6 +35,13 @@ func (e EventService) GetGiftRequestsForEvent(eventId string, userId string) ([]
 			})
 		} else {
 			// someone elses gift
+
+			if request.AssignedUserId != nil && *request.AssignedUserId != userId {
+				// hide already claimed gifts by others to add more mystery
+				// should probably push this down to the DB, but lazy right now
+				continue
+			}
+
 			giftRequests = append(giftRequests, GiftRequestOutput{
 				Id:             request.Id,
 				UserId:         request.UserId,
