@@ -31,7 +31,7 @@ func (u UserGateway) LoginDemoHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id, oneMonth)
+	u.setLoginCookie(w, session.Id)
 
 	logrus.WithField("userId", session.UserId).Info("logged user in with demo")
 }
@@ -53,7 +53,7 @@ func (u UserGateway) LoginGoogleHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id, oneMonth)
+	u.setLoginCookie(w, session.Id)
 
 	logrus.WithField("userId", session.UserId).Info("logged user in with google")
 }
@@ -69,9 +69,16 @@ func (u UserGateway) AdminLoginHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.setCookie(w, session.Id, oneMonth)
+	u.setLoginCookie(w, session.Id)
 
 	logrus.WithField("userId", userId).Info("logged admin user in")
+}
+
+func (u UserGateway) setLoginCookie(w http.ResponseWriter, sessionId string) {
+	// attempt to kill an existing cookie that may have already been expired
+	u.setLogoutCookie(w, sessionId)
+
+	u.setCookie(w, sessionId, oneMonth)
 }
 
 func (u UserGateway) setCookie(w http.ResponseWriter, sessionId string, expires time.Time) {
@@ -96,9 +103,13 @@ func (u UserGateway) LogoutHttp(w http.ResponseWriter, r *http.Request) {
 
 	sessionId := cookie.Value
 
-	u.setCookie(w, sessionId, time.Now().Add(-7*24*time.Hour))
+	u.setLogoutCookie(w, sessionId)
 
 	logrus.WithField("sessionId", sessionId).Info("logged user out")
+}
+
+func (u UserGateway) setLogoutCookie(w http.ResponseWriter, sessionId string) {
+	u.setCookie(w, sessionId, time.Now().Add(-7*24*time.Hour))
 }
 
 func (u UserGateway) CurrentUserHttp(w http.ResponseWriter, r *http.Request) {

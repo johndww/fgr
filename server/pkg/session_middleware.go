@@ -16,7 +16,7 @@ func (s SessionMiddleware) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(SessionCookieName)
 		if err != nil {
-			if r.URL.Path == "/users/me" {
+			if r.URL.Path == "/api/v1/users/me" {
 				// dont log, using this for session timeouts
 			} else {
 				logrus.WithError(err).WithField("route", r.URL.Path).Warn("unable to read session cookie")
