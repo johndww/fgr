@@ -3,12 +3,17 @@ package routes
 import (
 	"fmt"
 	"github.com/microcosm-cc/bluemonday"
+	"html"
 	"reflect"
 )
 
 // SanitizeFields recursively sanitizes string fields of a given interface{} object
 func SanitizeFields(input interface{}) {
 	p := bluemonday.UGCPolicy()
+
+	sanitizeFn := func(userInput string) string {
+		return html.UnescapeString(p.Sanitize(userInput))
+	}
 
 	// Use reflection to inspect the type of the input
 	val := reflect.ValueOf(input)
@@ -35,7 +40,7 @@ func SanitizeFields(input interface{}) {
 		// If the field is a string, sanitize it
 		if field.Kind() == reflect.String {
 			oldValue := field.String()
-			newValue := p.Sanitize(oldValue)
+			newValue := sanitizeFn(oldValue)
 
 			// Set the sanitized value back to the field
 			field.SetString(newValue)
@@ -46,7 +51,7 @@ func SanitizeFields(input interface{}) {
 			if !field.IsNil() {
 				// If the pointer is not nil, sanitize the string value it points to
 				oldValue := field.Elem().String()
-				newValue := p.Sanitize(oldValue)
+				newValue := sanitizeFn(oldValue)
 				field.Elem().SetString(newValue)
 			}
 		}
